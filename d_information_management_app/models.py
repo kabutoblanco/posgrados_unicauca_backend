@@ -17,7 +17,7 @@ class Country(models.Model):
 
 class Department(models.Model):
     name = models.CharField(max_length=30, blank=False, null=False)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=False, null=False)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=False, null=True)
     
     class Meta:
         verbose_name = 'Departamento'
@@ -28,7 +28,7 @@ class Department(models.Model):
 
 class City(models.Model):
     name = models.CharField(max_length=30, blank=False, null=False)
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=False, null=False)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=False, null=True)
 
     class Meta:
         verbose_name = 'Ciudad'
@@ -39,7 +39,7 @@ class City(models.Model):
 
 class Institution(models.Model):
     name_inst = models.CharField(max_length=30, blank=False, null=False)
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, blank=False, null=False)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, blank=False, null=True)
 
     class Meta:
         verbose_name = 'Institucion'
@@ -64,7 +64,7 @@ class Professor(models.Model):
 
 class Faculty(models.Model):
     name = models.CharField(max_length=30, blank=False, null=False)
-    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=False)
+    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
 
     class Meta:
         verbose_name = 'Facultad'
@@ -75,7 +75,7 @@ class Faculty(models.Model):
 
 class DepartmentU(models.Model):
     name = models.CharField(max_length=30, blank=False, null=False)
-    faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, blank=False, null=False)
+    faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, blank=False, null=True)
 
     class Meta:
         verbose_name = 'DepartamentoU'
@@ -102,7 +102,7 @@ class DepartmentU(models.Model):
 
 # modelos
 class InvestigationGroup(models.Model):
-    departmentU = models.ForeignKey(DepartmentU, on_delete=models.CASCADE, blank=False, null=False)
+    departmentU = models.ForeignKey(DepartmentU, on_delete=models.SET_NULL, blank=False, null=True)
     name = models.CharField(max_length=50)
     category = models.CharField(max_length=50)
     email = models.EmailField()
@@ -148,8 +148,8 @@ class WorksInvestGroup(models.Model):
         verbose_name_plural = 'Trabaja'
 
 class Drive(models.Model):
-    inv_line = models.ForeignKey(InvestigationLine, on_delete=models.CASCADE, blank=False, null=False, default=1)
-    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, blank=False, null=False, default=1)
+    inv_line = models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True, default=1)
+    professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True, default=1)
     analysis_state = models.BooleanField()
 
     class Meta:
@@ -157,8 +157,8 @@ class Drive(models.Model):
         verbose_name_plural = 'Maneja'
 
 class Directs(models.Model):
-    inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.CASCADE, blank=False, null=False, default=1)
-    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, blank=False, null=False, default=1)
+    inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.SET_NULL, blank=False, null=True, default=1)
+    professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True, default=1)
     direction_state = models.BooleanField()
     
     class Meta:
@@ -166,8 +166,8 @@ class Directs(models.Model):
         verbose_name_plural = 'Dirige'
 
 class IsMember(models.Model):
-    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, blank=False, null=False)
-    inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.CASCADE, blank=False, null=False)
+    professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
+    inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.SET_NULL, blank=False, null=True)
     membershio_status = models.BooleanField()
 
     class Meta:
@@ -176,7 +176,7 @@ class IsMember(models.Model):
 
 class WorksDepartm(models.Model):
     professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
-    departmentU = models.ForeignKey(DepartmentU, on_delete=models.CASCADE, blank=False, null=True)
+    departmentU = models.ForeignKey(DepartmentU, on_delete=models.SET_NULL, blank=False, null=True)
     laboral_category = models.CharField(max_length=50, blank=False, null=False)
     laboral_state = models.BooleanField(default=False)
 
