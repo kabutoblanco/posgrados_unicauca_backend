@@ -1,6 +1,6 @@
 from django.db import models
 from a_students_app.models import Student, Program
-from d_information_management_app.models import Institution, LineResearch, Professor
+from d_information_management_app.models import Institution, InvestigationLine, Professor
 
 class Activity(models.Model):
     STATE_CHOICES = (
@@ -120,7 +120,7 @@ class ParticipationProjects(models.Model):
     typo_convocation = models.CharField(max_length=100, blank=False, null=False)
 
     activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=False)
-    line_research =  models.ForeignKey(LineResearch, on_delete=models.SET_NULL, blank=False, null=False)
+    investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=False)
     investigator = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=False)
 
     date_record = models.DateTimeField(auto_now=False)
