@@ -5,6 +5,29 @@ from d_information_management_app.models import Professor
 from b_activities_app.models import Activity
 
 class TestCoordinator(models.Model):
+    """
+    Clase usada para registrar los log de las evaluaciones del coordinador para una actividad
+    - - - - -
+    Attributes
+    - - - - -
+    credits : int
+        Número de créditos
+    observations : str
+        Observaciones realizadas (opcional)
+    activity : int
+        Referencia a una actividad
+    coordinator : int
+        Referencia a un profesor
+    date_record : datetime
+        Fecha de registro
+    date_update : datetime
+        Fecha de último cambio realizado
+    is_active : boolean
+        Indica si el registro esta activo
+    Methods
+    - - - - - 
+    void
+    """
     credits = models.IntegerField(default=0)        
     observations = models.CharField(max_length=148)
 
@@ -24,6 +47,29 @@ class TestCoordinator(models.Model):
 
 
 class TestDirector(models.Model):
+    """
+    Clase usada para registrar los log de las evaluaciones del director para una actividad
+    - - - - -
+    Attributes
+    - - - - -
+    credits : int
+        Número de créditos
+    observations : str
+        Observaciones realizadas (opcional)
+    activity : int
+        Referencia a una actividad
+    coordinator : int
+        Referencia a un profesor
+    date_record : datetime
+        Fecha de registro
+    date_update : datetime
+        Fecha de último cambio realizado
+    is_active : boolean
+        Indica si el registro esta activo
+    Methods
+    - - - - - 
+    void
+    """
     credits = models.IntegerField(default=0)
     observations = models.CharField(max_length=148)
 
@@ -43,6 +89,40 @@ class TestDirector(models.Model):
 
 
 class Tracking(models.Model):
+    """
+    Clase usada para realizar el seguimiento de un estudiante
+    - - - - -
+    Attributes
+    - - - - -
+    state : int
+        choices: 1_ACTIVO, 2_INACTIVO, 3_GRADUADO, 4_BALANCEADO, 5_RETIRADO
+    enrrollment_date : date
+        Fecha de matricula
+    graduation_date : date
+        Fecha de graduación
+    num_folio : string
+        Número de folio
+    num_acta : string
+        Número de acta
+    num_diploma : string
+        Número de diploma
+    num_resolution : string
+        Número de resolución
+    observations : string (opcional)
+        Observaciones
+    student : int
+        Referencia a un estudiante
+    date_record : datetime
+        Fecha de registro
+    date_update : datetime
+        Fecha de último cambio realizado
+    is_active : boolean
+        Indica si el registro esta activo
+    Methods
+    - - - - - 
+    void
+    """
+
     TYPE_CHOICES = ((1, _("ACTIVO")), (2, _("INACTIVO")),
                     (3, _("GRADUADO")), (4, _("BALANCEADO")), (5, _("RETIRADO")))
     
