@@ -1,3 +1,13 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+admin.site.register([
+    Activity,
+    Presentation,
+    Publication,
+    ProjectCourse,
+    ResearchStays,
+    PresentationResults,
+    ParticipationProjects,
+    Prize
+])

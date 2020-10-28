@@ -4,6 +4,33 @@ from d_information_management_app.models import Institution, InvestigationLine, 
 from django.utils.translation import ugettext_lazy as _
 
 class Activity(models.Model):
+    """
+    Clase usada para registrar las actividades de investigacion de los estudiantes durante su posgrado
+    - - - - -
+    Attributes
+    - - - - -
+    title : str(60) (opcional)
+        Titulo de la actividad que realiza el estudiante 
+    name : str(60) (opcional)
+        Nombre de la actividad que realiza el estudiante
+    description : str(148)
+        Descripcion de la actividad que realiza el estudiante
+    receipt : file
+        Justifiante de la actividad, archivo almacenado de tipo .pdf
+    state : int
+        Controla el estado actual de la actividad
+    start_date : date
+        Fecha en la que se da inicio, se realiza o se envia la actividad
+    end_date : date (opcional)
+        Fecha en la que se da por terminada o se publica la actividad
+    academic_year : str
+        Año academico en el que se registra la actividad
+    type : str
+        Tipo de actividad que se registra
+    - - - - -
+    Methods
+    - - - - -
+    """
     STATE_CHOICES = (
         (1, _("REGISTRADO")),
         (2, _("EN_REVISION")),
@@ -11,8 +38,8 @@ class Activity(models.Model):
         (4, _("ACEPTADA")),
     )
 
-    title = models.CharField(max_length=60, blank=False, null=False)
-    name = models.CharField(max_length=60, blank=False, null=False)
+    title = models.CharField(max_length=60, blank=True)
+    name = models.CharField(max_length=60, blank=True)
     description = models.CharField(max_length=148, blank=False, null=False)
     receipt = models.FileField(upload_to="b_activities_app/archivos", blank=False, null=False)
     state = models.IntegerField(choices=STATE_CHOICES, default=1) 
