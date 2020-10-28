@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager
+from d_accounts_app.models import User
 
 import datetime
 
@@ -15,7 +16,17 @@ class Country(models.Model):
     def __str__(self):
         return self.name
 
-class Department(models.Model):
+class State(models.Model):
+    """
+    Clase usada para gestionar la informacion de un departamento de un pais
+    - - - - -
+    Attributes
+    - - - - -
+    name : string[50]
+        Nombre del departamento
+    country : int
+        Referencia a un pais
+    """
     name = models.CharField(max_length=30, blank=False, null=False)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=False, null=True)
     
@@ -28,7 +39,7 @@ class Department(models.Model):
 
 class City(models.Model):
     name = models.CharField(max_length=30, blank=False, null=False)
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=False, null=True)
+    state = models.ForeignKey(State, on_delete=models.SET_NULL, blank=False, null=True)
 
     class Meta:
         verbose_name = 'Ciudad'
@@ -49,7 +60,7 @@ class Institution(models.Model):
         return self.name_inst
 
 class Professor(models.Model):
-    #persona = models.ForeignKey(Persona, )
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=False, null=True)
     institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
     is_director_student = models.BooleanField(default=False)
     is_director_gi = models.BooleanField(default=False)
@@ -59,8 +70,8 @@ class Professor(models.Model):
         verbose_name = 'Profesor'
         verbose_name_plural = 'Profesores'
     
-    # def __str__(self):
-    #     return self.name
+    def __str__(self):
+        return self.user
 
 class Faculty(models.Model):
     name = models.CharField(max_length=30, blank=False, null=False)
@@ -73,13 +84,13 @@ class Faculty(models.Model):
     def __str__(self):
         return self.name
 
-class DepartmentU(models.Model):
+class Department(models.Model):
     name = models.CharField(max_length=30, blank=False, null=False)
     faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, blank=False, null=True)
 
     class Meta:
-        verbose_name = 'DepartamentoU'
-        verbose_name_plural = 'DepartamentosU'
+        verbose_name = 'Departamento de la universidad'
+        verbose_name_plural = 'Departamentos de la universidad'
     
     def __str__(self):
         return self.name
@@ -102,7 +113,23 @@ class DepartmentU(models.Model):
 
 # modelos
 class InvestigationGroup(models.Model):
-    departmentU = models.ForeignKey(DepartmentU, on_delete=models.SET_NULL, blank=False, null=True)
+    """
+    Clase usada para gestionar la informacion de un grupo de investigacion
+    - - - - -
+    Attributes
+    - - - - -
+    departamentU : int
+        Referencia a un departamento de la universidad
+    name : string[50]
+        Nombre del grupo de investigacion
+    category : string[50]
+        Categoria del grupo de investigacion
+    email : string
+        Email del grupo de investigacion
+    foundation_date : date
+        Fecha de fundacion del grupo de investigacion
+    """
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=False, null=True)
     name = models.CharField(max_length=50)
     category = models.CharField(max_length=50)
     email = models.EmailField()
@@ -147,7 +174,7 @@ class WorksInvestGroup(models.Model):
         verbose_name = 'Trabaja'
         verbose_name_plural = 'Trabaja'
 
-class Drive(models.Model):
+class ManageInvestLine(models.Model):
     inv_line = models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True, default=1)
     professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True, default=1)
     analysis_state = models.BooleanField()
@@ -156,7 +183,7 @@ class Drive(models.Model):
         verbose_name = 'Maneja'
         verbose_name_plural = 'Maneja'
 
-class Directs(models.Model):
+class ManageInvestGroup(models.Model):
     inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.SET_NULL, blank=False, null=True, default=1)
     professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True, default=1)
     direction_state = models.BooleanField()
@@ -176,7 +203,7 @@ class IsMember(models.Model):
 
 class WorksDepartm(models.Model):
     professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
-    departmentU = models.ForeignKey(DepartmentU, on_delete=models.SET_NULL, blank=False, null=True)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=False, null=True)
     laboral_category = models.CharField(max_length=50, blank=False, null=False)
     laboral_state = models.BooleanField(default=False)
 
