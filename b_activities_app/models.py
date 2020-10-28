@@ -1,6 +1,7 @@
 from django.db import models
 from a_students_app.models import Student, Program
 from d_information_management_app.models import Institution, InvestigationLine, Professor
+from django.utils.translation import ugettext_lazy as _
 
 class Activity(models.Model):
     STATE_CHOICES = (
@@ -14,13 +15,13 @@ class Activity(models.Model):
     name = models.CharField(max_length=60, blank=False, null=False)
     description = models.CharField(max_length=148, blank=False, null=False)
     receipt = models.FileField(upload_to="b_activities_app/archivos", blank=False, null=False)
-    state = models.models.IntegerField(choices=STATE_CHOICES, default=1) 
+    state = models.IntegerField(choices=STATE_CHOICES, default=1) 
     start_date = models.DateField(blank=False, null=False)
     end_date = models.DateField(blank=False, null=False)
     academic_year = models.CharField(max_length=10, blank=False, null=False)
     type = models.CharField(max_length=40, blank=False, null=False)
 
-    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=False)
+    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -37,8 +38,8 @@ class Activity(models.Model):
 class Presentation(models.Model):
     place = models.CharField(max_length=40, blank=False, null=False)
 
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=False)
-    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=False)
+    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=True)
+    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -55,7 +56,7 @@ class Publication(models.Model):
     general_data = models.CharField(max_length=148, blank=False, null=False)
     editorial = models.CharField(max_length=100, blank=False, null=False)
 
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=False)
+    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -67,10 +68,10 @@ class Publication(models.Model):
 
 # Curso / Direccion de proyectos / Revision de proyectos
 class ProjectCourse(models.Model):
-    program = models.ForeignKey(Program, on_delete=models.SET_NULL, blank=False, null=False)
     assigned_hours = models.PositiveIntegerField(blank=False, null=False)
 
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=False)
+    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=True)
+    program = models.ForeignKey(Program, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -85,8 +86,8 @@ class ResearchStays(models.Model):
     purpose = models.CharField(max_length=100, blank=False, null=False)
     responsible = models.CharField(max_length=20, blank=False, null=False)
 
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=False)
-    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=False)
+    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=True)
+    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -102,7 +103,7 @@ class PresentationResults(models.Model):
     duration = models.CharField(max_length=20, blank=False, null=False)
     place = models.CharField(max_length=40, blank=False, null=False)
 
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=False)
+    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -119,9 +120,9 @@ class ParticipationProjects(models.Model):
     convocation = models.CharField(max_length=40, blank=False, null=False)
     typo_convocation = models.CharField(max_length=100, blank=False, null=False)
 
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=False)
-    investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=False)
-    investigator = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=False)
+    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=True)
+    investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True)
+    investigator = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -134,7 +135,7 @@ class ParticipationProjects(models.Model):
 class Prize(models.Model):
     name = models.CharField(max_length=40, blank=False, null=False)
 
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=False)
+    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)

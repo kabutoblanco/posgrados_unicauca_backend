@@ -7,8 +7,8 @@ class Project(models.Model):
     provisional_title = models.CharField(max_length=40, blank=False, null=False)
     objetive_topic = models.CharField(max_length=80, blank=False, null=False)
     
-    investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=False)
-    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=False)
+    investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True)
+    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -20,7 +20,7 @@ class Project(models.Model):
 
 class Objetive(models.Model):
 
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=False, null=False)
+    project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -34,7 +34,7 @@ class General(models.Model):
 
     objetive_general = models.CharField(max_length=148, blank=False, null=False)
 
-    objetive = models.ForeignKey(Objetive, on_delete=models.SET_NULL, blank=False, null=False)
+    objetive = models.ForeignKey(Objetive, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -48,7 +48,7 @@ class Specific(models.Model):
 
     objetive_specific = models.CharField(max_length=148, blank=False, null=False)
 
-    objetive = models.ForeignKey(Objetive, on_delete=models.SET_NULL, blank=False, null=False)
+    objetive = models.ForeignKey(Objetive, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -62,8 +62,8 @@ class DirectorControl(models.Model):
 
     academic_period = models.CharField(max_length=20, blank=False, null=False)
 
-    director = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=False)
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=False, null=False)
+    director = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
+    project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -77,8 +77,8 @@ class CoDirectorControl(models.Model):
 
     academic_period = models.CharField(max_length=20, blank=False, null=False)
 
-    codirector = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=False)
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=False, null=False)
+    codirector = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
+    project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)

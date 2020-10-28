@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from d_information_management_app.models import Professor
 from b_activities_app.models import Activity
+from a_students_app.models import Student
 
 class TestCoordinator(models.Model):
     """
