@@ -62,7 +62,7 @@ class Agreement(models.Model):
 
 
 class Program(models.Model):
-    name = models.CharField(max_lenght=148)
+    name = models.CharField(max_length=148)
 
     class Meta:
         verbose_name = 'Programa'
