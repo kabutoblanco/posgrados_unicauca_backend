@@ -27,6 +27,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost']
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ORIGIN_WHITELIST = (
+    "http://localhost:3000",
+)
+
 
 # Application definition
 
@@ -47,6 +54,7 @@ INSTALLED_APPS = [
     # COMPLEMENTO DE EXTERNOS
     'rest_framework',
     'knox',
+    'corsheaders',
 ]
 
 # REDEFINICIÓN DE LOS TOKENS CON KNOX
@@ -58,6 +66,7 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = "d_accounts_app.User"
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
