@@ -69,7 +69,7 @@ class Program(models.Model):
         verbose_name_plural = 'Programas'
 
     def __str__(self):
-        return '[{}] {} | {} |'.format(self.id, self.name)
+        return '[{}] {}'.format(self.id, self.name)
 
 
 class Student(models.Model):
