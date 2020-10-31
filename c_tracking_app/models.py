@@ -29,11 +29,11 @@ class TestCoordinator(models.Model):
     - - - - - 
     void
     """
-    credits = models.IntegerField(default=0)        
-    observations = models.CharField(max_length=148)
+    credits = models.IntegerField(default=0, verbose_name='creditos')  
+    observations = models.CharField(max_length=148, verbose_name='observaciones')
 
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=True, null=True)
-    coordinator = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=True, null=True)
+    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='actividad')
+    coordinator = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='profesor')
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -53,8 +53,8 @@ class TestDirector(models.Model):
     - - - - -
     Attributes
     - - - - -
-    credits : int
-        Número de créditos
+    value : int
+        choices: 1_FAVORABLE, 2_NO_FAVORABLE
     observations : str
         Observaciones realizadas (opcional)
     activity : int
@@ -71,11 +71,14 @@ class TestDirector(models.Model):
     - - - - - 
     void
     """
-    credits = models.IntegerField(default=0)
-    observations = models.CharField(max_length=148)
 
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=True, null=True)
-    coordinator = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=True, null=True)
+    VALUE_CHOICES = ((1, _("FAVORABLE")), (2, _("NO_FAVORABLE")))
+
+    value = models.IntegerField(choices=VALUE_CHOICES, default=1, verbose_name='calificacion')
+    observations = models.CharField(max_length=148, verbose_name='observacion')
+
+    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='actividad')
+    coordinator = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='profesor')
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -83,7 +86,7 @@ class TestDirector(models.Model):
 
     class Meta:
         verbose_name = 'Evaluación del director'
-        verbose_name_plural = 'Evaluaciónes de los directores'
+        verbose_name_plural = 'Evaluaciones de los directores'
 
     def __str__(self):
         return '[{}] {}'.format(self.id, self.activity)
@@ -127,16 +130,16 @@ class Tracking(models.Model):
     TYPE_CHOICES = ((1, _("ACTIVO")), (2, _("INACTIVO")),
                     (3, _("GRADUADO")), (4, _("BALANCEADO")), (5, _("RETIRADO")))
     
-    state = models.IntegerField(choices=TYPE_CHOICES, default=1)
-    enrollment_date = models.DateField(auto_now=False)
-    graduation_date = models.DateField(auto_now=False)
-    num_folio = models.CharField(max_length=24)
-    num_acta = models.CharField(max_length=24)
-    num_diploma = models.CharField(max_length=24)
-    num_resolution = models.CharField(max_length=24)
-    observations = models.CharField(max_length=148, blank=True)
+    state = models.IntegerField(choices=TYPE_CHOICES, default=1, verbose_name='estado')
+    enrollment_date = models.DateField(auto_now=False, verbose_name='fecha de matricula')
+    graduation_date = models.DateField(auto_now=False, verbose_name='fecha de graduación')
+    num_folio = models.CharField(max_length=24, verbose_name='numero de folio')
+    num_acta = models.CharField(max_length=24, verbose_name='numero de acta')
+    num_diploma = models.CharField(max_length=24, verbose_name='numero de diploma')
+    num_resolution = models.CharField(max_length=24, verbose_name='numero de resolucion')
+    observations = models.CharField(max_length=148, blank=True, verbose_name='observaciones')
 
-    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True)
+    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='estudiante')
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
@@ -148,3 +151,22 @@ class Tracking(models.Model):
 
     def __str__(self):
         return '[{}] {} | {} |'.format(self.id, self.student, self.state)
+
+
+class ActivityProfessor(models.Model):
+    TYPE_CHOICES = ((1, _("DIRECTOR")), (2, _("COODIRECTOR")), (2, _("COORDINADOR")))
+
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, verbose_name='actividad')
+    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, verbose_name='profesor')
+    rol = models.IntegerField(choices=TYPE_CHOICES, default=1, verbose_name='rol')
+
+    date_record = models.DateTimeField(auto_now=False)
+    date_update = models.DateTimeField(auto_now=False)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = 'Actividad de un profesor'
+        verbose_name_plural = 'Actividades de un profesor'
+
+    def __str__(self):
+        return '[{}] {} | {} | {}'.format(self.id, self.activity, self.professor, self.rol)
