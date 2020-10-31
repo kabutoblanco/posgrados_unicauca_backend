@@ -5,3 +5,4 @@ from .models import *
 admin.site.register(TestCoordinator)
 admin.site.register(TestDirector)
 admin.site.register(Tracking)
+admin.site.register(ActivityProfessor)
