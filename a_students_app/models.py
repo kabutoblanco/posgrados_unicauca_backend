@@ -69,7 +69,7 @@ class Program(models.Model):
         verbose_name_plural = 'Programas'
 
     def __str__(self):
-        return '[{}] {} | {} |'.format(self.id, self.name)
+        return '[{}] {}'.format(self.id, self.name)
 
 
 class Student(models.Model):
@@ -93,7 +93,8 @@ class Student(models.Model):
 
 
 class Enrrollment(models.Model):
-    TYPE_CHOICES = ((1, _("GRADUADO")), (2, _("BALANCEADO")), (3, _("RETIRADO")))
+    TYPE_CHOICES = ((1, _("ACTIVO")), (2, _("INACTIVO")),
+                    (3, _("GRADUADO")), (4, _("BALANCEADO")), (5, _("RETIRADO")))
 
     admission_date = models.DateField(auto_now=False)
     enrrollment_date = models.DateField(auto_now=False)
@@ -111,6 +112,6 @@ class Enrrollment(models.Model):
         verbose_name_plural = 'Matriculas'
 
     def __str__(self):
-        return '[{}] {} | {} |'.format(self.id, self.student, self.state)
+        return '[{}] {} | {} | {}'.format(self.id, self.student, self.state, self.period)
 
 
