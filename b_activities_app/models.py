@@ -48,11 +48,11 @@ class Activity(models.Model):
 
     title = models.CharField(max_length=60, blank=True)
     name = models.CharField(max_length=60, blank=True)
-    description = models.CharField(max_length=148, blank=False, null=False)
+    description = models.CharField(max_length=148, blank=True, null=False)
     receipt = models.FileField(upload_to="b_activities_app/archivos", blank=False, null=False)
     state = models.IntegerField(choices=STATE_CHOICES, default=1) 
     start_date = models.DateField(blank=False, null=False)
-    end_date = models.DateField(blank=True)
+    end_date = models.DateField(blank=True, null=True)
     academic_year = models.CharField(max_length=10, blank=False, null=False)
     type = models.CharField(max_length=40, blank=False, null=False)
 
@@ -190,7 +190,6 @@ class PresentationResults(Activity):
         verbose_name='Exposición de resultados parciales de investigación'
         verbose_name_plural='Exposiciónes de resultados parciales de investigación'
 
-# 
 class ParticipationProjects(Activity):
     """
     Clase usada para registrar las actividades de tipo Participación en proyecto de investigación

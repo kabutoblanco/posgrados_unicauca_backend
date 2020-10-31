@@ -49,3 +49,13 @@ class PrizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prize
         fields = '__all__'
+
+# --- #
+
+from a_students_app.models import Enrrollment
+
+class PeriodSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Enrrollment
+        fields = [ 'period' ]
