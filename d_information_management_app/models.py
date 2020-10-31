@@ -115,7 +115,7 @@ class Professor(models.Model):
         verbose_name_plural = 'Profesores'
     
     def __str__(self):
-        return self.user
+        return "{}".format(self.user)
 
 class Faculty(models.Model):
     """
