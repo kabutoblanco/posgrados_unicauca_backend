@@ -154,7 +154,7 @@ class Tracking(models.Model):
 
 
 class ActivityProfessor(models.Model):
-    TYPE_CHOICES = ((1, _("DIRECTOR")), (2, _("COODIRECTOR")), (2, _("COORDINADOR")))
+    TYPE_CHOICES = ((1, _("DIRECTOR")), (2, _("COODIRECTOR")), (3, _("COORDINADOR")))
 
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, verbose_name='actividad')
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE, verbose_name='profesor')

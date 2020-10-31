@@ -12,5 +12,6 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/student', StudentListAPI.as_view()),
     path('api/student/<int:id_student>/activity', ActivityListStudentAPI.as_view()),
-    path('api/professor/<int:id_professor>/activity', ActivityProfessorAPI.as_view())
+    path('api/director/<int:id_professor>/activity', ActivityDirectorAPI.as_view()),
+    path('api/coordinator/<int:id_professor>/activity', ActivityCoordinatorAPI.as_view())
 ]

@@ -2,6 +2,7 @@ from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
+from a_students_app.models import StudentProfessor
 
 from django.db.models import Avg, Sum, Count
 
@@ -33,15 +34,38 @@ class ActivityListStudentAPI(generics.RetrieveAPIView):
 
 
 # - - - - - SEGUNDO SPRINT - - - - -
-class ActivityProfessorAPI(generics.RetrieveAPIView):
-    serializer_class = ActivitySerializer
+class ActivityDirectorAPI(generics.RetrieveAPIView):
+    serializer_class = EnrrollmentSerializer
+
+    # def get(self, request, *args, **kwargs):        
+    #     queryset = ActivityProfessor.objects.filter(is_active=True, professor=kwargs['id_professor']).values('activity__student')
+    #     list = [e['activity__student'] for e in queryset]
+    #     queryset = Student.objects.filter(is_active=True, id__in=list)
+    #     queryset_list = Enrrollment.objects.none()
+    #     for student in queryset:
+    #         queryset_list = queryset_list | Enrrollment.objects.filter(student__user=student.user.id).order_by('-period')[:1]
+    #     return Response({"students": EnrrollmentSerializer(queryset_list, many=True).data})
 
     def get(self, request, *args, **kwargs):        
-        queryset = ActivityProfessor.objects.filter(is_active=True, professor=kwargs['id_professor']).values('activity__student')
+        queryset = StudentProfessor.objects.filter(is_active=True, professor=kwargs['id_professor']).values('student')
+        list = [e['student'] for e in queryset]
+        queryset = Student.objects.filter(is_active=True, id__in=list)
+        queryset_list = Enrrollment.objects.none()
+        for student in queryset:
+            queryset_list = queryset_list | Enrrollment.objects.filter(student__user=student.user.id).order_by('-period')[:1]
+        return Response({"students": EnrrollmentSerializer(queryset_list, many=True).data})
+
+
+class ActivityCoordinatorAPI(generics.RetrieveAPIView):
+    serializer_class = EnrrollmentSerializer
+
+    def get(self, request, *args, **kwargs):        
+        queryset = ActivityProfessor.objects.filter(is_active=True, professor=kwargs['id_professor'], rol=3).values('activity__student')
         list = [e['activity__student'] for e in queryset]
         queryset = Student.objects.filter(is_active=True, id__in=list)
         queryset_list = Enrrollment.objects.none()
         for student in queryset:
             queryset_list = queryset_list | Enrrollment.objects.filter(student__user=student.user.id).order_by('-period')[:1]
         return Response({"students": EnrrollmentSerializer(queryset_list, many=True).data})
+
 # - - - - - SEGUNDO SPRINT - - - - -
