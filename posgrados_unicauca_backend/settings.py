@@ -25,7 +25,7 @@ SECRET_KEY = 'l5y$dy8$*c&)4=rnvc$$uw8(4^f(xu_o3!@hk!s8h0qrujo&00'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', 'mdquilindo.pythonanywhere.com']
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
