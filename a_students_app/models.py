@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from d_information_management_app.models import Professor
 from d_accounts_app.models import User
+from d_information_management_app.models import InvestigationGroup
 
 
 class GrantAgreement(models.Model):
@@ -128,15 +129,29 @@ class StudentProfessor(models.Model):
     date_update = models.DateTimeField(auto_now=False)
     is_active = models.BooleanField(default=True)
 
+    class Meta:
+        verbose_name = 'Director/Coodirectores'
+        verbose_name_plural = 'Directores/Coodirector'
+
+    def __str__(self):
+        return '[{}] {} | {} | {}'.format(self.id, self.student, self.professor, self.rol)
+
 
 class StudentGroupInvestigation(models.Model):
     membership_start_date = models.DateField(auto_now=False)
     membership_end_date = models.DateField(auto_now=False)
 
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='estudiante')
-    line_investigation = models.ForeignKey(Professor, on_delete=models.CASCADE, verbose_name='linea de investigacion')
+    investigation_group = models.ForeignKey(InvestigationGroup, on_delete=models.CASCADE, verbose_name='grupo de investigacion')
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
     is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = 'Mis grupos de investigacion'
+        verbose_name_plural = 'Mi grupo de investigacion'
+
+    def __str__(self):
+        return '[{}] {} | {}'.format(self.id, self.student, self.investigation_group)
 
