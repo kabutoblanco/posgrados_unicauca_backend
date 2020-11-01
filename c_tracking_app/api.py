@@ -20,7 +20,7 @@ class StudentListAPI(generics.RetrieveAPIView):
         El usuario debe tener un token que lo valide
     """
 
-    permission_classes = (IsAuthenticated, )
+    # permission_classes = (IsAuthenticated, )
     serializer_class = EnrrollmentSerializer
 
     def get(self, request, *args, **kwargs):
@@ -46,7 +46,7 @@ class TrackingAPI(viewsets.ModelViewSet):
         El usuario debe tener a cargo al menos una actividad como coordinator
     """
 
-    permission_classes = [IsAuthenticated, (IsDirector | IsCoordinador)]
+    # permission_classes = [IsAuthenticated, (IsDirector | IsCoordinador)]
     serializer_class = TrackingSerializer
     queryset = Tracking.objects.all()
 
@@ -65,7 +65,7 @@ class ActivityListStudentAPI(generics.RetrieveAPIView):
         El usuario debe tener a cargo al menos una actividad como coordinator
     """
 
-    permission_classes = [IsAuthenticated, (IsDirector | IsCoordinador)]
+    # permission_classes = [IsAuthenticated, (IsDirector | IsCoordinador)]
     serializer_class = ActivitySerializer
 
     def get(self, request, *args, **kwargs):
@@ -90,7 +90,7 @@ class ActivityDirectorAPI(generics.RetrieveAPIView):
         El usuario debe tener a cargo al menos una actividad como coordinator
     """
 
-    permission_classes = (IsAuthenticated, IsDirector)
+    # permission_classes = (IsAuthenticated, IsDirector)
     serializer_class = EnrrollmentSerializer
 
     def get(self, request, *args, **kwargs):
@@ -119,7 +119,7 @@ class ActivityCoordinatorAPI(generics.RetrieveAPIView):
         El usuario debe tener a cargo al menos una actividad como coordinator
     """
     
-    permission_classes = (IsAuthenticated, IsCoordinador)
+    # permission_classes = (IsAuthenticated, IsCoordinador)
     serializer_class = EnrrollmentSerializer
 
     def get(self, request, *args, **kwargs):
