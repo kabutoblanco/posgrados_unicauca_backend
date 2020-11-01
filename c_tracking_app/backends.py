@@ -4,6 +4,8 @@ from a_students_app.models import StudentProfessor
 from d_information_management_app.models import Professor
 from .models import ActivityProfessor
 
+DELETE = 'DELETE'
+
 class IsDirector(permissions.BasePermission):
     """
     Clase que permite determinar si un usuario es director o no
