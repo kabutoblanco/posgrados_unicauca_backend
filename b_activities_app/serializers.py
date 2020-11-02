@@ -3,7 +3,6 @@ from rest_framework import serializers
 from .models import *
 
 # Modulo B #
-
 class ActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -53,7 +52,6 @@ class PrizeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 # Consultas a otros modulos #
-
 from a_students_app.models import Program
 from d_information_management_app.models import Institution, InvestigationLine, Professor, City, Country 
 
@@ -93,8 +91,7 @@ class CountrySerializer(serializers.ModelSerializer):
         model = Country
         fields = '__all__'
 
-# Consultas #
-
+# Otras Consultas #
 from a_students_app.models import Enrrollment
 
 class PeriodSerializer(serializers.ModelSerializer):

@@ -45,11 +45,10 @@ class Activity(models.Model):
         (3, _("REVISADA")),
         (4, _("ACEPTADA")),
     )
-
     title = models.CharField(max_length=60, blank=True)
     name = models.CharField(max_length=60, blank=True)
     description = models.CharField(max_length=148, blank=True, null=False)
-    receipt = models.FileField(upload_to="b_activities_app/archivos", blank=False, null=False)
+    receipt = models.FileField(upload_to="b_activities_app/archivos", blank=True, null=False)
     state = models.IntegerField(choices=STATE_CHOICES, default=1) 
     start_date = models.DateField(blank=False, null=False)
     end_date = models.DateField(blank=True, null=True)
@@ -59,7 +58,7 @@ class Activity(models.Model):
     student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_update = models.DateTimeField(auto_now=True) 
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -67,7 +66,7 @@ class Activity(models.Model):
         verbose_name_plural='Actividades'
 
     def __str__(self):
-        return self.name
+        return self.id
 
 class Lecture(Activity):
     """
@@ -255,4 +254,4 @@ class Prize(models.Model):
         verbose_name_plural='Premios'
 
     def __str__(self):
-        return self.name
+        return self.id + " " + self.name
