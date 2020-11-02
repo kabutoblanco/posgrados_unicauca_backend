@@ -29,6 +29,7 @@ class TestCoordinator(models.Model):
     - - - - - 
     void
     """
+    
     credits = models.IntegerField(default=0, verbose_name='creditos')  
     observations = models.CharField(max_length=148, verbose_name='observaciones')
 
@@ -154,6 +155,23 @@ class Tracking(models.Model):
 
 
 class ActivityProfessor(models.Model):
+    """
+    Clase usada para vincular profesores a la activdad como director, coodirector y/o coordinador
+    - - - - -
+    Attributes
+    - - - - -
+    activity : int
+        Referencia a una actividad
+    professor : int
+        Referencia a un profesor
+    rol : int
+        Rol del profesor en la actividad
+        choices: 1_DIRECTOR, 2_COODIRECTOR, 3_COORDINADOR
+    Methods
+    - - - - - 
+    void
+    """
+
     TYPE_CHOICES = ((1, _("DIRECTOR")), (2, _("COODIRECTOR")), (3, _("COORDINADOR")))
 
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, verbose_name='actividad')

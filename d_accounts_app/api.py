@@ -5,6 +5,8 @@ from .models import User
 from .serializers import *
 
 
+#permission_classes = [IsAuthenticated | IsAdminUser] en la api de crear user
+
 class UserAPI(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
