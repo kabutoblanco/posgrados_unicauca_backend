@@ -8,7 +8,7 @@ from .serializers import *
 
 # Modulo B #
 class ActivityViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, (IsStudent | IsDirector | IsCoordinador)]
+    #permission_classes = [IsAuthenticated, (IsStudent | IsDirector | IsCoordinador)]
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
 
