@@ -58,7 +58,7 @@ class Activity(models.Model):
     student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=True) 
+    date_update = models.DateTimeField(auto_now=False) 
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -66,7 +66,7 @@ class Activity(models.Model):
         verbose_name_plural='Actividades'
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 class Lecture(Activity):
     """
