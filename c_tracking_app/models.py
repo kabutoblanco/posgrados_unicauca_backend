@@ -132,7 +132,7 @@ class Tracking(models.Model):
                     (3, _("GRADUADO")), (4, _("BALANCEADO")), (5, _("RETIRADO")))
     
     state = models.IntegerField(choices=TYPE_CHOICES, default=1, verbose_name='estado')
-    enrollment_date = models.DateField(auto_now=False, verbose_name='fecha de matricula')
+    enrrollment_date = models.DateField(auto_now=False, verbose_name='fecha de matricula')
     graduation_date = models.DateField(auto_now=False, verbose_name='fecha de graduación')
     num_folio = models.CharField(max_length=24, verbose_name='numero de folio')
     num_acta = models.CharField(max_length=24, verbose_name='numero de acta')
