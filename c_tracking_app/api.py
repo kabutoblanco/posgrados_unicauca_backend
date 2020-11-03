@@ -50,7 +50,7 @@ class StudentListAPI(generics.RetrieveAPIView):
         queryset_list = Enrrollment.objects.none()
         for student in queryset:
             queryset_list = queryset_list | Enrrollment.objects.filter(
-                student__user=student.user.id).order_by('-period')[:1]
+                student__user=student.user).order_by('-period')[:1]
         return Response({"students": EnrrollmentSerializer(queryset_list, many=True).data})
 
 
