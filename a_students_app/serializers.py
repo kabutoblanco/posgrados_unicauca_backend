@@ -30,9 +30,13 @@ class GrantSerializer(serializers.ModelSerializer):
         model = Grant
         fields = "__all__"
 
-
-
 class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = "__all__"
+
+
+'''class StudentSerializer(serializers.ModelSerializer):
     user = UserSerializer()
   
     class Meta:
@@ -44,4 +48,4 @@ class StudentSerializer(serializers.ModelSerializer):
         user_instance = User.objects.create (**user_data)        
         
         student= Student.objects.create ( user= user_instance,**validated_data)
-        return student
+        return student'''

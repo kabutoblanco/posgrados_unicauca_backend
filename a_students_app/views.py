@@ -1,10 +1,9 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.views import APIView 
-from .models import Student,Enrrollment
-from .serializers import StudentSerializer, UserSerializer, EnrrollmentSerializer, GrantSerializer, AgreementSerializer
+from .models import Student,Enrrollment,Program
+from .serializers import StudentSerializer, UserSerializer, EnrrollmentSerializer, GrantSerializer, AgreementSerializer,ProgramSerializer
 from d_accounts_app.models import User
-from rest_framework.status import (HTTP_201_CREATED)
+
 class StudentViewSet(ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
@@ -16,14 +15,19 @@ class UserViewSet(ModelViewSet):
 class EnrrollmentViewSet(ModelViewSet):
     queryset = Enrrollment.objects.all()
     serializer_class = EnrrollmentSerializer
+    
 
-class StudentApiView(APIView):
+class ProgramViewSet(ModelViewSet):
+    queryset = Program.objects.all()
+    serializer_class = ProgramSerializer
+
+'''class StudentApiView(APIView):
     serializer_student= StudentSerializer
     serializer_enrrollment= EnrrollmentSerializer
     serializer_grant = GrantSerializer
     serializer_agreement = AgreementSerializer
     
-    '''def post (self,request,*args):
+    def post (self,request,*args):
         serializer = self.serializer_student(data=request.data['student'])
         if serializer.is_valid(raise_exception=True):
             serializer = serializer.save()

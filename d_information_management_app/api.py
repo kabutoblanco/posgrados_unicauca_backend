@@ -124,7 +124,7 @@ class ConsultState_CountryAPI(APIView):
 
 class ConsultCity_StateAPI(APIView):
     def get(self, request, *args, **kwargs):
-        queryset = City.objects.filter(state=kwargs["id_state"])
+        queryset = City.objects.filter(state=kwargs["id_dep"])
         return Response({"Citys": CitySerializer(queryset, many=True).data })
 
 class ConsultInstitutionAPI(APIView):
