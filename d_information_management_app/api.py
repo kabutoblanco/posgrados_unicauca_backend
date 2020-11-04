@@ -24,7 +24,7 @@ from .models import (Country, State, City, Institution, Professor, Faculty, Depa
 
 #coordinador_comite de programa y el superUser 
 class CreateCountryAPI(APIView):
-    permission_classes = [IsAuthenticated , IsAdminUser]
+    #permission_classes = [IsAuthenticated , IsAdminUser]
     def post(self, request):
         serializer = CountrySerializer(data = request.data) 
         if serializer.is_valid():#Valida que los tipos de datos sean correctos
@@ -35,7 +35,7 @@ class CreateCountryAPI(APIView):
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 class CreateStateAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated , IsAdminUser]
+    #permission_classes = [IsAuthenticated , IsAdminUser]
     serializer_class = StateSerializer
 
     def post(self, request):
@@ -48,7 +48,7 @@ class CreateStateAPI(generics.GenericAPIView):
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 class CreateCityAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated , IsAdminUser]
+    #permission_classes = [IsAuthenticated , IsAdminUser]
     serializer_class = CitySerializer
 
     def post(self, request):
@@ -61,7 +61,7 @@ class CreateCityAPI(generics.GenericAPIView):
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 class CreateInstitutionAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated , IsAdminUser]
+    #permission_classes = [IsAuthenticated , IsAdminUser]
     serializer_class = InstitutionSerializer
 
     def post(self, request):
@@ -74,7 +74,7 @@ class CreateInstitutionAPI(generics.GenericAPIView):
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 class CreateProfessorAPI(generics.GenericAPIView):# toca modificarlo a los cambios nuevos
-    permission_classes = [IsAuthenticated , IsAdminUser]
+    #permission_classes = [IsAuthenticated , IsAdminUser]
     serializer_class = ProfessorSerializer
 
     def post(self, request):
@@ -87,7 +87,7 @@ class CreateProfessorAPI(generics.GenericAPIView):# toca modificarlo a los cambi
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 class CreateFacultyAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated , IsAdminUser]
+    #permission_classes = [IsAuthenticated , IsAdminUser]
     serializer_class = FacultySerializer
 
     def post(self, request):
@@ -100,7 +100,7 @@ class CreateFacultyAPI(generics.GenericAPIView):
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 class CreateDepartmentAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated , IsAdminUser]
+    #permission_classes = [IsAuthenticated , IsAdminUser]
     serializer_class = DepartmentSerializer
 
     def post(self, request):
@@ -124,7 +124,7 @@ class ConsultState_CountryAPI(APIView):
 
 class ConsultCity_StateAPI(APIView):
     def get(self, request, *args, **kwargs):
-        queryset = City.objects.filter(state=kwargs["id_state"])
+        queryset = City.objects.filter(state=kwargs["id_dep"])
         return Response({"Citys": CitySerializer(queryset, many=True).data })
 
 class ConsultInstitutionAPI(APIView):
@@ -158,7 +158,7 @@ class ConsultDepartment_idAPI(APIView):
         return Response({"Department": DepartmentSerializer(queryset, many=True).data })
 
 class CreateAcademicTrainingAPI(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated, IsProfessor]
+    #permission_classes = [IsAuthenticated, IsProfessor]
     serializer_class = AcademicTrainingSerializer
 
     def post(self, request):

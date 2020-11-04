@@ -87,36 +87,6 @@ class Institution(models.Model):
     def __str__(self):
         return self.name_inst
 
-class Professor(models.Model):
-    """
-    Clase usada para gestionar la informacion de un profesor
-    - - - - -
-    Attributes
-    - - - - -
-    user : int
-        Referencia a un usuario del sistema
-    institution : int
-        Referencia a una institucion registrada
-    is_director_student : boolean
-        Estado de la relacion en la cual el profesor es director o no de un estudiante
-    is_director_gi : boolean
-        Estado de la relacion en la cual el profesor es director o no de un grupo de investigacion
-    is_internal : boolean
-        Estado de la relacion en la cual el profesor es interno o no en la universidad
-    """
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=False, null=True)
-    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
-    is_director_student = models.BooleanField(default=False)
-    is_director_gi = models.BooleanField(default=False)
-    is_internal = models.BooleanField(default=False)
-
-    class Meta:
-        verbose_name = 'Profesor'
-        verbose_name_plural = 'Profesores'
-    
-    def __str__(self):
-        return "{}".format(self.user)
-
 class Faculty(models.Model):
     """
     Clase usada para gestionar la informacion de una facultad
@@ -158,6 +128,39 @@ class Department(models.Model):
     
     def __str__(self):
         return self.name
+
+class Professor(models.Model):
+    """
+    Clase usada para gestionar la informacion de un profesor
+    - - - - -
+    Attributes
+    - - - - -
+    user : int
+        Referencia a un usuario del sistema
+    institution : int
+        Referencia a una institucion registrada
+    department : int
+        Referencia a un departamento de la universidad
+    is_director_student : boolean
+        Estado de la relacion en la cual el profesor es director o no de un estudiante
+    is_director_gi : boolean
+        Estado de la relacion en la cual el profesor es director o no de un grupo de investigacion
+    is_internal : boolean
+        Estado de la relacion en la cual el profesor es interno o no en la universidad
+    """
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=False, null=True)
+    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=False, null=True)
+    is_director_student = models.BooleanField(default=False)
+    is_director_gi = models.BooleanField(default=False)
+    is_internal = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'Profesor'
+        verbose_name_plural = 'Profesores'
+    
+    def __str__(self):
+        return "{}".format(self.user)
 
 class AcademicTraining(models.Model):
     """
