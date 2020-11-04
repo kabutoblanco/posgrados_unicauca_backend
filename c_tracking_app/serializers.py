@@ -47,4 +47,4 @@ class EnrrollmentSerializer(serializers.ModelSerializer):
 class TrackingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tracking
-        fields = ('id', '__all__')
+        fields = '__all__'
