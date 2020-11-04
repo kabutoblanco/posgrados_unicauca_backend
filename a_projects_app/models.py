@@ -30,29 +30,20 @@ class Objetive(models.Model):
         verbose_name='Objetivo'
         verbose_name_plural='Objetivos'
 
-class General(models.Model):
+class General(Objetive):
 
     objetive_general = models.CharField(max_length=148, blank=False, null=False)
 
-    objetive = models.ForeignKey(Objetive, on_delete=models.SET_NULL, blank=False, null=True)
-
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
-    is_active = models.BooleanField(default=True)
-
+  
     class Meta:
         verbose_name='Objetivo general'
         verbose_name_plural='Objetivos generales'
 
-class Specific(models.Model):
+class Specific(Objetive):
 
     objetive_specific = models.CharField(max_length=148, blank=False, null=False)
 
-    objetive = models.ForeignKey(Objetive, on_delete=models.SET_NULL, blank=False, null=True)
-
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
-    is_active = models.BooleanField(default=True)
+    
 
     class Meta:
         verbose_name='Objetivo especifico'
