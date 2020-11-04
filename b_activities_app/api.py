@@ -10,12 +10,10 @@ from d_accounts_app.models import User
 from .email import *
 
 def SendEmailNotification(request):
-    to_email = []
     queryUser = User.objects.get(student=request.data.get('student'))
-    print(queryUser)
     queryset = StudentProfessor.objects.filter(student=request.data.get('student')).values('professor')
-    for proff in queryset:
-        id_Proffesor = proff.get('professor')
+    for reg in queryset:
+        id_Proffesor = reg.get('professor')
         professor = Professor.objects.filter(id=id_Proffesor)[0]
         
         send_email(queryUser, professor)  

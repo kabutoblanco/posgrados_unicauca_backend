@@ -17,12 +17,6 @@ def send_email(student, professor):
     email_professor = professor.user.email
     email_student = student.email
 
-    # if subject and message and from_email:
-    #     try:
-    #         send_mail(subject,message,from_email,to_email)
-    #     except BadHeaderError:
-    #         return BadHeaderError
-
     body = render_to_string('newActivity.html',
         {'first_name': first_name, 'last_name': last_name, 'first_name_student': first_name_student, 'last_name_student': last_name_student, 'code_student': code_student},)
     email_message = EmailMessage(
