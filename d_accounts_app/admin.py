@@ -10,7 +10,7 @@ class Admin(BaseUserAdmin):
         (None, {"fields": ("username", "email", "password")}),
         (
             _("Personal info"),
-            {"fields": ("type_id", "personal_code", "personal_id", "first_name", "last_name",
+            {"fields": ("type_id", "personal_code", "personal_id", "first_name", "last_name", "photo",
                         "telephone", "address")},
         ),
         (
