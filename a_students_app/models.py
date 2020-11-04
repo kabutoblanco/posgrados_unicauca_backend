@@ -11,9 +11,13 @@ class GrantAgreement(models.Model):
     start_date = models.DateField(auto_now=False)
     end_date = models.DateField(auto_now=False)
 
+    student = models.ForeignKey ('Student', on_delete=models.SET_NULL, blank=True, null=True)
+
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False)
     is_active = models.BooleanField(default=True)
+
+    
 
     class Meta:
         verbose_name = 'Beca/Convenio'
@@ -23,17 +27,13 @@ class GrantAgreement(models.Model):
         return '[{}] {} | {} |'.format(self.id, self.start_date, self.end_date)
 
 
-class Grant(models.Model):
+class Grant(GrantAgreement):
     name = models.CharField(max_length=48)
     announcement = models.DateField(auto_now=False)
     description = models.CharField(max_length=48)
     num_resolution = models.CharField(max_length=48)
 
-    grant_agreement = models.ForeignKey(GrantAgreement, on_delete=models.SET_NULL, blank=True, null=True)
-
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
-    is_active = models.BooleanField(default=True)
+       
 
     class Meta:
         verbose_name = 'Beca'
@@ -43,18 +43,13 @@ class Grant(models.Model):
         return '[{}] {} | {} |'.format(self.id, self.name, self.announcement)
 
 
-class Agreement(models.Model):
+class Agreement(GrantAgreement):
     agreement_date = models.DateField(auto_now=False)
     period_academic = models.CharField(max_length=12)
     percentage_discount = models.FloatField(default=0.0)
     observation = models.CharField(max_length=148)
 
-    grant_agreement = models.ForeignKey(GrantAgreement, on_delete=models.SET_NULL, blank=True, null=True)
-
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
-    is_active = models.BooleanField(default=True)
-
+   
     class Meta:
         verbose_name = 'Convenio'
         verbose_name_plural = 'Convenios'
