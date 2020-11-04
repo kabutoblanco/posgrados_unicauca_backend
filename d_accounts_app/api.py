@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, views
 from rest_framework.response import Response
 from knox.models import AuthToken
 from .models import User
@@ -37,12 +37,12 @@ class CreateUserAPI(generics.GenericAPIView):
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
-class ConsultUserAPI(APIView):
+class ConsultUserAPI(views.APIView):
     def get(self, request, *args, **kwargs):
         queryset = User.objects.all()
         return Response({"Users": CreateUserSerializer(queryset, many=True).data })
 
-class ConsultUser_PersonalAPI(APIView):
+class ConsultUser_PersonalAPI(views.APIView):
     def get(self, request, *args, **kwargs):
         queryset = User.objects.filter(personal_id=kwargs['id'])
         return Response({"Users": CreateUserSerializer(queryset, many=True).data })
