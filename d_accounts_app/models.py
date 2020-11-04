@@ -10,15 +10,15 @@ class User(AbstractUser):
         (3, _("TARJETA_IDENTIDAD")),
     )
 
-    type_id = models.IntegerField(choices=ID_CHOICES, default=1)
-    personal_id = models.CharField(max_length=24, unique=True)
-    personal_code = models.CharField(max_length=24, unique=True)
-    photo = models.FileField(upload_to="d_accounts_app/users", blank=False, null=False)
-    telephone = models.CharField(max_length=24)
-    address = models.CharField(max_length=64)
+    type_id = models.IntegerField(verbose_name='Tipo de ID', choices=ID_CHOICES, default=1)
+    personal_id = models.CharField(verbose_name='Numero de ID', max_length=24)
+    personal_code = models.CharField(verbose_name='Codigo ID', max_length=24)
+    photo = models.FileField(verbose_name='Foto', upload_to="d_accounts_app/users", blank=False, null=True)
+    telephone = models.CharField(verbose_name='Telefono', max_length=24)
+    address = models.CharField(verbose_name='Direccion', max_length=64)
 
-    is_proffessor = models.BooleanField(default=False)
-    is_student = models.BooleanField(default=True)
+    is_proffessor = models.BooleanField(verbose_name='Es profesor', default=False)
+    is_student = models.BooleanField(verbose_name='Es estudiante', default=True)
 
     class Meta:
         indexes = [
