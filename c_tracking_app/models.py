@@ -60,7 +60,7 @@ class TestDirector(models.Model):
         Observaciones realizadas (opcional)
     activity : int
         Referencia a una actividad
-    coordinator : int
+    director : int
         Referencia a un profesor
     date_record : datetime
         Fecha de registro
@@ -79,10 +79,10 @@ class TestDirector(models.Model):
     observations = models.CharField(max_length=148, verbose_name='observacion')
 
     activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='actividad')
-    coordinator = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='profesor')
+    director = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='profesor')
 
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_record = models.DateTimeField(auto_now=True)
+    date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -178,8 +178,8 @@ class ActivityProfessor(models.Model):
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE, verbose_name='profesor')
     rol = models.IntegerField(choices=TYPE_CHOICES, default=1, verbose_name='rol')
 
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_record = models.DateTimeField(auto_now=True)
+    date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
