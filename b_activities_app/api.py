@@ -6,6 +6,18 @@ from .backends import *
 from .models import *
 from .serializers import *
 
+from d_accounts_app.models import User
+from .email import *
+
+def SendEmailNotification(request):
+    queryUser = User.objects.get(student=request.data.get('student'))
+    queryset = StudentProfessor.objects.filter(student=request.data.get('student')).values('professor')
+    for reg in queryset:
+        id_Proffesor = reg.get('professor')
+        professor = Professor.objects.filter(id=id_Proffesor)[0]
+        
+        send_email(queryUser, professor)  
+
 # Modulo B #
 class ActivityViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated, (IsStudent | IsDirector | IsCoordinador)]
@@ -17,30 +29,78 @@ class LectureViewSet(viewsets.ModelViewSet):
     queryset = Lecture.objects.all()
     serializer_class = LectureSerializer
 
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+
+        if request.data.get('send_email'):
+            SendEmailNotification(request)
+
+        return response
+
 class PublicationViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated, (IsStudent | IsDirector | IsCoordinador)]
     queryset = Publication.objects.all()
     serializer_class = PublicationSerializer
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+
+        if request.data.get('send_email'):
+            SendEmailNotification(request)
+
+        return response
 
 class ProjectCourseViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated, (IsStudent | IsDirector | IsCoordinador)]
     queryset = ProjectCourse.objects.all()
     serializer_class = ProjectCourseSerializer
 
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+
+        if request.data.get('send_email'):
+            SendEmailNotification(request)
+
+        return response
+
 class ResearchStaysViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated, (IsStudent | IsDirector | IsCoordinador)]
     queryset = ResearchStays.objects.all()
     serializer_class = ResearchStaysSerializer
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+
+        if request.data.get('send_email'):
+            SendEmailNotification(request)
+
+        return response
 
 class PresentationResultsViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated, (IsStudent | IsDirector | IsCoordinador)]
     queryset = PresentationResults.objects.all()
     serializer_class = PresentationResultsSerializer
 
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+
+        if request.data.get('send_email'):
+            SendEmailNotification(request)
+
+        return response
+
 class ParticipationProjectsViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated, (IsStudent | IsDirector | IsCoordinador)]
     queryset = ParticipationProjects.objects.all()
     serializer_class = ParticipationProjectsSerializer
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+
+        if request.data.get('send_email'):
+            SendEmailNotification(request)
+
+        return response
 
 class PrizeViewSet(viewsets.ModelViewSet):
     queryset = Prize.objects.all()
@@ -101,7 +161,7 @@ class PeriodsAPI(generics.RetrieveAPIView):
     serializer_class = PeriodSerializer
 
     def get(self, request, *args, **kwargs):
-        queryset = Enrrollment.objects.filter(student__user=kwargs['id_user']).values('period').annotate(total=Count('period') )
+        queryset = Enrrollment.objects.filter(student__user=kwargs['id_user']).values('period').order_by('-period').annotate(total=Count('period') )
         return Response({"list_period": PeriodSerializer(queryset, many=True).data})
 
 class ActivitiesAPI(generics.RetrieveAPIView):

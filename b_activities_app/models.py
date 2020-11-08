@@ -45,6 +45,14 @@ class Activity(models.Model):
         (3, _("REVISADA")),
         (4, _("ACEPTADA")),
     )
+    TYPE_CHOICES = (
+        (1, _("Curso, dirección/revisión de proyecto")),
+        (2, _("Ponencia en congresos, simposios y/o jornadas")),
+        (3, _("Publicación")),
+        (4, _("Exposición de resultados parciales de investigación")),
+        (5, _("Estancia de investigación en otra institucion")),
+        (6, _("Participación en proyecto de investigación")),
+    )
     title = models.CharField(max_length=60, blank=True)
     name = models.CharField(max_length=60, blank=True)
     description = models.CharField(max_length=148, blank=True, null=False)
@@ -53,7 +61,7 @@ class Activity(models.Model):
     start_date = models.DateField(blank=False, null=False)
     end_date = models.DateField(blank=True, null=True)
     academic_year = models.CharField(max_length=10, blank=False, null=False)
-    type = models.CharField(max_length=40, blank=False, null=False)
+    type = models.IntegerField(choices=TYPE_CHOICES, default=1) 
 
     student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=True)
 
@@ -156,7 +164,7 @@ class ResearchStays(Activity):
     - - - - -
     """
     purpose = models.CharField(max_length=100, blank=False, null=False)
-    responsible = models.CharField(max_length=20, blank=False, null=False)
+    responsible = models.CharField(max_length=60, blank=False, null=False)
 
     institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
     city = models.ForeignKey(City, on_delete=models.SET_NULL, blank=False, null=True)
@@ -212,8 +220,8 @@ class ParticipationProjects(Activity):
     """
     place = models.CharField(max_length=40, blank=False, null=False)
     code_VRI = models.IntegerField(blank=False, null=False)
-    convocation = models.CharField(max_length=40, blank=False, null=False)
-    type_convocation = models.CharField(max_length=100, blank=False, null=False)
+    convocation = models.CharField(max_length=148, blank=False, null=False)
+    type_convocation = models.CharField(max_length=20, blank=False, null=False)
 
     investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True)
     investigator = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
