@@ -10,8 +10,8 @@ class Project(models.Model):
     investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True)
     student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=True)
 
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_record = models.DateTimeField(auto_now=True)
+    date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -22,8 +22,8 @@ class Objetive(models.Model):
 
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=False, null=True)
 
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_record = models.DateTimeField(auto_now=True)
+    date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -41,10 +41,7 @@ class General(Objetive):
 
 class Specific(Objetive):
 
-    objetive_specific = models.CharField(max_length=148, blank=False, null=False)
-
     
-
     class Meta:
         verbose_name='Objetivo especifico'
         verbose_name_plural='Objetivos especificos'
@@ -56,8 +53,8 @@ class DirectorControl(models.Model):
     director = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=False, null=True)
 
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_record = models.DateTimeField(auto_now=True)
+    date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -71,8 +68,8 @@ class CoDirectorControl(models.Model):
     codirector = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=False, null=True)
 
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_record = models.DateTimeField(auto_now=True)
+    date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Student, Program, Enrrollment, Agreement, Grant
+from .models import Student, Program, Enrrollment, Agreement, Grant, StudentProfessor
 from d_accounts_app.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -8,7 +8,11 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         exclude = ('groups','user_permissions')
     
-
+class StudentProfessorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentProfessor
+        fields = "__all__"
+    
 
 class ProgramSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,13 +34,13 @@ class GrantSerializer(serializers.ModelSerializer):
         model = Grant
         fields = "__all__"
 
-class StudentSerializer(serializers.ModelSerializer):
+'''class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = "__all__"
+        fields = "__all__" '''
 
 
-'''class StudentSerializer(serializers.ModelSerializer):
+class StudentSerializer(serializers.ModelSerializer):
     user = UserSerializer()
   
     class Meta:
@@ -48,4 +52,4 @@ class StudentSerializer(serializers.ModelSerializer):
         user_instance = User.objects.create (**user_data)        
         
         student= Student.objects.create ( user= user_instance,**validated_data)
-        return student'''
+        return student

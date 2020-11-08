@@ -13,8 +13,8 @@ class GrantAgreement(models.Model):
 
     student = models.ForeignKey ('Student', on_delete=models.SET_NULL, blank=True, null=True)
 
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_record = models.DateTimeField(auto_now=True)
+    date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     
@@ -100,8 +100,8 @@ class Enrrollment(models.Model):
 
     student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True)
 
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_record = models.DateTimeField(auto_now=True)
+    date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -120,8 +120,8 @@ class StudentProfessor(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='estudiante')
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE, verbose_name='profesor')
 
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_record = models.DateTimeField(auto_now=True)
+    date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -139,8 +139,8 @@ class StudentGroupInvestigation(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='estudiante')
     investigation_group = models.ForeignKey(InvestigationGroup, on_delete=models.CASCADE, verbose_name='grupo de investigacion')
 
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_record = models.DateTimeField(auto_now=True)
+    date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
