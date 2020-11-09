@@ -14,7 +14,8 @@ class TypeActiviyField(serializers.Field):
         super(TypeActiviyField, self).__init__(**kwargs)
 
     def to_representation(self, obj):
-        return self._choices[int(obj) - 1]
+        return obj
+        # return self._choices[int(obj) - 1]
 
     def to_internal_value(self, data):
         return getattr(self._choices, data)
