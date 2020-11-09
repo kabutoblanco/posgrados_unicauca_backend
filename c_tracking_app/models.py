@@ -1,9 +1,10 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.signals import post_save
 
 from d_information_management_app.models import Professor
 from b_activities_app.models import Activity
-from a_students_app.models import Student
+from a_students_app.models import Student, Enrrollment
 
 class TestCoordinator(models.Model):
     """
@@ -31,13 +32,13 @@ class TestCoordinator(models.Model):
     """
     
     credits = models.IntegerField(default=0, verbose_name='creditos')  
-    observations = models.CharField(max_length=148, verbose_name='observaciones')
+    observations = models.CharField(max_length=148, blank=True, verbose_name='observaciones')
 
     activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='actividad')
     coordinator = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='profesor')
 
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_record = models.DateTimeField(auto_now=True)
+    date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -76,7 +77,7 @@ class TestDirector(models.Model):
     VALUE_CHOICES = ((1, _("FAVORABLE")), (2, _("NO_FAVORABLE")))
 
     value = models.IntegerField(choices=VALUE_CHOICES, default=1, verbose_name='calificacion')
-    observations = models.CharField(max_length=148, verbose_name='observacion')
+    observations = models.CharField(max_length=148, blank=True, verbose_name='observacion')
 
     activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='actividad')
     director = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='profesor')
@@ -99,7 +100,7 @@ class Tracking(models.Model):
     - - - - -
     Attributes
     - - - - -
-    state : int
+    status : int
         choices: 1_ACTIVO, 2_INACTIVO, 3_GRADUADO, 4_BALANCEADO, 5_RETIRADO
     enrrollment_date : date
         Fecha de matricula
@@ -151,7 +152,20 @@ class Tracking(models.Model):
         verbose_name_plural = 'Seguimientos'
 
     def __str__(self):
-        return '[{}] {} | {} |'.format(self.id, self.student, self.state)
+        return '[{}] {} | {} |'.format(self.id, self.student, self.status)
+
+def create_customer(sender, instance, created, **kwargs):
+    if created:
+        try:
+            queryset = Enrrollment.objects.filter(
+                student__user=instance.student.user).order_by('-period')[:1]
+            queryset = queryset[0]
+            queryset.state = instance.status
+            queryset.save()
+        except:
+            pass
+
+post_save.connect(create_customer, sender=Tracking)
 
 
 class ActivityProfessor(models.Model):

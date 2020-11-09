@@ -62,3 +62,15 @@ class TrackingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tracking
         fields = '__all__'
+
+
+class TestDirectorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TestDirector
+        fields = '__all__'
+
+
+class TestCoordinatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TestCoordinator
+        fields = '__all__'
