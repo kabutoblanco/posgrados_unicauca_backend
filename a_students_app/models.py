@@ -29,7 +29,7 @@ class GrantAgreement(models.Model):
 
 class Grant(GrantAgreement):
     name = models.CharField(max_length=48)
-    announcement = models.DateField(auto_now=False)
+    announcement = models.IntegerField(default=0)
     description = models.CharField(max_length=48)
     num_resolution = models.CharField(max_length=48)
 
@@ -44,7 +44,7 @@ class Grant(GrantAgreement):
 
 
 class Agreement(GrantAgreement):
-    agreement_date = models.DateField(auto_now=False)
+    agreement_date = models.IntegerField(default=0)
     period_academic = models.CharField(max_length=12)
     percentage_discount = models.FloatField(default=0.0)
     observation = models.CharField(max_length=148)

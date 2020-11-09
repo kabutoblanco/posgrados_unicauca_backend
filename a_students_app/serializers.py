@@ -45,7 +45,7 @@ class StudentSerializer(serializers.ModelSerializer):
   
     class Meta:
         model = Student
-        fields = ('dedication', 'program','date_record','date_update','user')
+        fields = ('id','dedication', 'program','date_record','date_update','user')
     def create (self,validated_data):
         user_data = validated_data.pop ('user')             
                       
