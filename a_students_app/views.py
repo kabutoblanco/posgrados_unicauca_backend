@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from .models import Student,Enrrollment,Program, StudentProfessor
+from .models import Student,Enrrollment,Program, StudentProfessor,Agreement,Grant
 from .serializers import StudentSerializer, UserSerializer, EnrrollmentSerializer, GrantSerializer, AgreementSerializer,ProgramSerializer, StudentProfessorSerializer
 from d_accounts_app.models import User
 
@@ -24,6 +24,14 @@ class ProgramViewSet(ModelViewSet):
 class StudentProfessortViewSet(ModelViewSet):
     queryset = StudentProfessor.objects.all()
     serializer_class = StudentProfessorSerializer
+
+class GrantViewSet(ModelViewSet):
+    queryset = Grant.objects.all()
+    serializer_class = GrantSerializer
+
+class AgreementViewSet(ModelViewSet):
+    queryset = Agreement.objects.all()
+    serializer_class = AgreementSerializer
 
 '''class StudentApiView(APIView):
     serializer_student= StudentSerializer
