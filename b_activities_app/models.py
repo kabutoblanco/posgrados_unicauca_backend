@@ -168,7 +168,7 @@ class ResearchStays(Activity):
 
     institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
     city = models.ForeignKey(City, on_delete=models.SET_NULL, blank=False, null=True)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=False, null=True)
+    #country = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=False, null=True)
 
     class Meta:
         verbose_name='Estancia de investigación en otras instituciones'

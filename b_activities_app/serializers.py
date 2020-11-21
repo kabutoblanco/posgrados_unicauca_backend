@@ -93,9 +93,22 @@ class CountrySerializer(serializers.ModelSerializer):
 
 # Otras Consultas #
 from a_students_app.models import Enrrollment
+from c_tracking_app.models import TestDirector, TestCoordinator
 
 class PeriodSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Enrrollment
         fields = [ 'period' ]
+
+class TestDirectorSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TestDirector
+        fields = [ 'value', 'observations' ]
+
+class TestCoordinatorSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TestCoordinator
+        fields = [ 'credits', 'observations' ]

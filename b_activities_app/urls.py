@@ -27,7 +27,9 @@ router.register('country', CountryViewSet)
 urlpatterns = [
     path( 'api/', include(router.urls) ),
     
-    # Otras Consultas #
+    # Otro tipo de Consultas #
+    path( 'api/testDirector/<int:id_activity>/', TestDirectorAPI.as_view() ),
+    path( 'api/testCoordinator/<int:id_activity>/', TestCoordinatorAPI.as_view() ),
     path( 'api/period/student/<int:id_user>/', PeriodAPI.as_view() ),
     path( 'api/periods/student/<int:id_user>/', PeriodsAPI.as_view() ),
     path( 'api/activities/student/<int:id_user>/<str:academic_year>/', ActivitiesAPI.as_view() )

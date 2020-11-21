@@ -134,8 +134,9 @@ class CountryViewSet(viewsets.ModelViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
-# Otras Consultas #
+# Otro tipo de Consultas #
 from a_students_app.models import Enrrollment
+from c_tracking_app.models import TestDirector, TestCoordinator
 from rest_framework.response import Response
 
 from rest_framework.status import (
@@ -149,6 +150,26 @@ from django.http import HttpResponse
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Avg, Sum, Count
+
+class TestDirectorAPI(generics.RetrieveAPIView):
+
+    def get(self, request, *args, **kwargs):
+        queryset = TestDirector.objects.filter(activity=kwargs['id_activity']).order_by('-date_update')[:1]
+
+        if( len(queryset) > 0 ):
+            return Response({"eval_dir": TestDirectorSerializer(queryset[0], many=False).data})
+        else:
+            return Response({"eval_dir": None})
+
+class TestCoordinatorAPI(generics.RetrieveAPIView):
+
+    def get(self, request, *args, **kwargs):
+        queryset = TestCoordinator.objects.filter(activity=kwargs['id_activity']).order_by('-date_update')[:1]
+
+        if( len(queryset) > 0 ):
+            return Response({"eval_coord": TestCoordinatorSerializer(queryset[0], many=False).data})
+        else:
+            return Response({"eval_coord": None})
 
 class PeriodAPI(generics.RetrieveAPIView):
 
