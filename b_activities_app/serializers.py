@@ -2,12 +2,27 @@ from rest_framework import serializers
 
 from .models import *
 
+# Serializers
+class TypeActiviyField(serializers.Field):
+    def __init__(self, choices, **kwargs):
+        self._choices = choices
+        super(TypeActiviyField, self).__init__(**kwargs)
+
+    def to_representation(self, obj):
+        return self._choices
+
+    def to_internal_value(self, data):
+        return getattr(self._choices, data)
+
 # Modulo B #
 class ActivitySerializer(serializers.ModelSerializer):
+
+    type = serializers.CharField(source='get_type_display')
 
     class Meta:
         model = Activity
         fields = '__all__'
+    
 
 class LectureSerializer(serializers.ModelSerializer):
 
