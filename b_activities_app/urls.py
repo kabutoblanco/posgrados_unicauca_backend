@@ -20,7 +20,7 @@ router.register('prize', PrizeViewSet)
 router.register('program', ProgramViewSet)
 router.register('instititution', InstitutionViewSet)
 router.register('investigationline', InvestigationLineViewSet)
-router.register('investigator', ProfessorViewSet)
+router.register('investigator', InvestigatorViewSet)
 router.register('city', CityViewSet)
 router.register('country', CountryViewSet)
 

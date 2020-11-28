@@ -108,7 +108,7 @@ class PrizeViewSet(viewsets.ModelViewSet):
 
 # Consultas a otros modulos #
 from a_students_app.models import Program
-from d_information_management_app.models import Institution, InvestigationLine, Professor, City, Country 
+from d_information_management_app.models import Institution, InvestigationLine, Professor, City, Country, ManageInvestLine
 
 class ProgramViewSet(viewsets.ModelViewSet):
     queryset = Program.objects.all()
@@ -122,9 +122,14 @@ class InvestigationLineViewSet(viewsets.ModelViewSet):
     queryset = InvestigationLine.objects.all()
     serializer_class = InvestigationLineSerializer
 
-class ProfessorViewSet(viewsets.ModelViewSet):
-    queryset = Professor.objects.all()
-    serializer_class = ProfessorSerializer
+class InvestigatorViewSet(viewsets.ModelViewSet):
+    queryset = ManageInvestLine.objects.all().values('professor')
+    reg=''
+    queryinv = ManageInvestLine.objects.none()
+    for reg in queryset:
+        queryinv |= Professor.objects.filter( id=reg.get('professor') )
+    queryset = queryinv
+    serializer_class = InvestigatorSerializer
 
 class CityViewSet(viewsets.ModelViewSet):
     queryset = City.objects.all()

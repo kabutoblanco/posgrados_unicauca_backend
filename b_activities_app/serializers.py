@@ -16,7 +16,6 @@ class TypeActiviyField(serializers.Field):
 
 # Modulo B #
 class ActivitySerializer(serializers.ModelSerializer):
-
     type = serializers.CharField(source='get_type_display')
 
     class Meta:
@@ -69,6 +68,7 @@ class PrizeSerializer(serializers.ModelSerializer):
 # Consultas a otros modulos #
 from a_students_app.models import Program
 from d_information_management_app.models import Institution, InvestigationLine, Professor, City, Country 
+from d_accounts_app.models import User
 
 class ProgramSerializer(serializers.ModelSerializer):
 
@@ -88,11 +88,18 @@ class InvestigationLineSerializer(serializers.ModelSerializer):
         model = InvestigationLine
         fields = '__all__'
 
-class ProfessorSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']
+
+class InvestigatorSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Professor
-        fields = '__all__'
+        fields = ['id', 'user']
 
 class CitySerializer(serializers.ModelSerializer):
 
