@@ -249,12 +249,12 @@ class Prize(models.Model):
     Methods
     - - - - -
     """
-    name = models.CharField(max_length=40, blank=False, null=False)
+    name = models.CharField(max_length=40, blank=False, null=False, unique=True)
 
     activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=True)
 
-    date_record = models.DateTimeField(auto_now=False)
-    date_update = models.DateTimeField(auto_now=False)
+    date_record = models.DateTimeField(auto_now=True)
+    date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -262,4 +262,4 @@ class Prize(models.Model):
         verbose_name_plural='Premios'
 
     def __str__(self):
-        return self.id + " " + self.name
+        return str(self.id) + " " + self.name

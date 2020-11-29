@@ -196,3 +196,10 @@ class ActivitiesAPI(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         queryset = Activity.objects.filter(student__user=kwargs['id_user'], academic_year=kwargs['academic_year'])
         return Response({"list_activities": ActivitySerializer(queryset, many=True).data})    
+
+class PrizeAPI(generics.RetrieveAPIView):
+    serializer_class = PrizeSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = Prize.objects.filter(activity=kwargs['id_activity'])
+        return Response({"prizes": PrizeSerializer(queryset, many=True).data})    
