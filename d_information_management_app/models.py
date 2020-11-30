@@ -290,6 +290,9 @@ class WorksInvestGroup(models.Model):
     class Meta:
         verbose_name = 'Trabaja'
         verbose_name_plural = 'Trabaja'
+    
+    def __str__(self):
+        return "{} trabaja en {}".format(self.inv_group, self.know_area)
 
 class ManageInvestLine(models.Model):
     """
@@ -351,11 +354,14 @@ class IsMember(models.Model):
     """
     professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
     inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.SET_NULL, blank=False, null=True)
-    membershio_status = models.BooleanField()
+    member_status = models.BooleanField()
 
     class Meta:
         verbose_name = 'Es Miembro'
         verbose_name_plural = 'Son Miembros'
+
+    def __str__(self):
+        return "{} es miembro de {}".format(self.professor, self.inv_group)
 
 class WorksDepartm(models.Model):
     """
