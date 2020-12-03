@@ -195,7 +195,7 @@ class PrizeAPI(generics.RetrieveAPIView):
         queryset = Prize.objects.filter(activity=kwargs['id_activity'])
         return Response({"prizes": PrizeSerializer(queryset, many=True).data})  
 
-class InvestigatorViewSet(generics.RetrieveAPIView):
+class InvestigatorsAPI(generics.RetrieveAPIView):
     serializer_class = InvestigatorSerializer
 
     def get(self, request, *args, **kwargs):
@@ -205,3 +205,10 @@ class InvestigatorViewSet(generics.RetrieveAPIView):
             queryinv = queryinv | Professor.objects.filter( id=reg.get('professor') )
         queryset = queryinv
         return Response({"investigadores": InvestigatorSerializer(queryset, many=True).data})  
+
+class InvestigatorAPI(generics.RetrieveAPIView):
+    serializer_class = InvestigatorSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = Professor.objects.filter(id=kwargs['id_professor'])
+        return Response({"investigator": InvestigatorSerializer(queryset[0], many=False).data})

@@ -33,7 +33,8 @@ urlpatterns = [
     path( 'api/periods/student/<int:id_user>/', PeriodsAPI.as_view() ),
     path( 'api/activities/student/<int:id_user>/<str:academic_year>/', ActivitiesAPI.as_view() ),
     path( 'api/prizes/<int:id_activity>/', PrizeAPI.as_view() ),
-    path( 'api/investigator/', InvestigatorViewSet.as_view() )
+    path( 'api/investigator/', InvestigatorsAPI.as_view() ),
+    path( 'api/investigator/<int:id_professor>/', InvestigatorAPI.as_view() )
 ]
 
 #urlpatterns+=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
