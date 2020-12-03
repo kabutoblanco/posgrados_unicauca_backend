@@ -20,7 +20,6 @@ router.register('prize', PrizeViewSet)
 router.register('program', ProgramViewSet)
 router.register('instititution', InstitutionViewSet)
 router.register('investigationline', InvestigationLineViewSet)
-router.register('investigator', InvestigatorViewSet)
 router.register('city', CityViewSet)
 router.register('country', CountryViewSet)
 
@@ -33,7 +32,8 @@ urlpatterns = [
     path( 'api/period/student/<int:id_user>/', PeriodAPI.as_view() ),
     path( 'api/periods/student/<int:id_user>/', PeriodsAPI.as_view() ),
     path( 'api/activities/student/<int:id_user>/<str:academic_year>/', ActivitiesAPI.as_view() ),
-    path( 'api/prizes/<int:id_activity>/', PrizeAPI.as_view() )
+    path( 'api/prizes/<int:id_activity>/', PrizeAPI.as_view() ),
+    path( 'api/investigator/', InvestigatorViewSet.as_view() )
 ]
 
 #urlpatterns+=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
