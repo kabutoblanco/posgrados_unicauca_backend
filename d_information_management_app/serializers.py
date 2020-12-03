@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import (Country, State, City, Institution, Professor, Faculty, Department, InvestigationGroup, 
                     KnowledgeArea, InvestigationLine, WorksDepartm, ManageInvestLine, ManageInvestGroup, 
-                    WorksInvestGroup, AcademicTraining)
+                    WorksInvestGroup, AcademicTraining, IsMember)
 
 # Create your serializers here.
 # --------------------------------------------------Arias
@@ -149,5 +149,16 @@ class ManageInvestGroupSerializer(serializers.ModelSerializer):
 
     def create(self, validate_data):
         instance = ManageInvestGroup.objects.create(**validate_data)
+        instance.save()
+        return instance
+
+#Es miembro
+class IsMemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IsMember
+        fields = '__all__'
+
+    def create(self, validate_data):
+        instance = IsMember.objects.create(**validate_data)
         instance.save()
         return instance

@@ -3,6 +3,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Permission, AbstractUser
 
 # Create your models here.
+
+#def ValidatePersonalID():
+
+
 class User(AbstractUser):
     ID_CHOICES = (
         (1, _("CEDULA")),
@@ -13,7 +17,7 @@ class User(AbstractUser):
     type_id = models.IntegerField(verbose_name='Tipo de ID', choices=ID_CHOICES, default=1)
     personal_id = models.CharField(verbose_name='Numero de ID', max_length=24)
     personal_code = models.CharField(verbose_name='Codigo ID', max_length=24)
-    photo = models.FileField(verbose_name='Foto', upload_to="d_accounts_app/users", blank=False, null=True)
+    photo = models.FileField(verbose_name='Foto', upload_to="d_accounts_app/users/%Y/%m/%d")
     telephone = models.CharField(verbose_name='Telefono', max_length=24)
     address = models.CharField(verbose_name='Direccion', max_length=64)
 
