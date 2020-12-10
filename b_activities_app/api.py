@@ -122,15 +122,6 @@ class InvestigationLineViewSet(viewsets.ModelViewSet):
     queryset = InvestigationLine.objects.all()
     serializer_class = InvestigationLineSerializer
 
-class InvestigatorViewSet(viewsets.ModelViewSet):
-    queryset = ManageInvestLine.objects.all().values('professor')
-    reg=''
-    queryinv = ManageInvestLine.objects.none()
-    for reg in queryset:
-        queryinv |= Professor.objects.filter( id=reg.get('professor') )
-    queryset = queryinv
-    serializer_class = InvestigatorSerializer
-
 class CityViewSet(viewsets.ModelViewSet):
     queryset = City.objects.all()
     serializer_class = CitySerializer
@@ -202,4 +193,22 @@ class PrizeAPI(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         queryset = Prize.objects.filter(activity=kwargs['id_activity'])
-        return Response({"prizes": PrizeSerializer(queryset, many=True).data})    
+        return Response({"prizes": PrizeSerializer(queryset, many=True).data})  
+
+class InvestigatorsAPI(generics.RetrieveAPIView):
+    serializer_class = InvestigatorSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset1 = ManageInvestLine.objects.all().values('professor')
+        queryinv = Professor.objects.none()
+        for reg in queryset1:
+            queryinv = queryinv | Professor.objects.filter( id=reg.get('professor') )
+        queryset = queryinv
+        return Response({"investigadores": InvestigatorSerializer(queryset, many=True).data})  
+
+class InvestigatorAPI(generics.RetrieveAPIView):
+    serializer_class = InvestigatorSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = Professor.objects.filter(id=kwargs['id_professor'])
+        return Response({"investigator": InvestigatorSerializer(queryset[0], many=False).data})

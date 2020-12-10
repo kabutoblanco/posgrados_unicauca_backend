@@ -62,6 +62,7 @@ class Activity(models.Model):
     end_date = models.DateField(blank=True, null=True)
     academic_year = models.CharField(max_length=10, blank=False, null=False)
     type = models.IntegerField(choices=TYPE_CHOICES, default=1) 
+    status_check = models.BooleanField(default=False)
 
     student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=True)
 
