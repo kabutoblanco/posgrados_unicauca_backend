@@ -1,5 +1,6 @@
 from rest_framework import permissions
 
+from .models import User
 from d_information_management_app.models import Professor
 from c_tracking_app.models import ActivityProfessor
 from a_students_app.models import Student, StudentProfessor
@@ -17,7 +18,7 @@ class IsProfessor(permissions.BasePermission):
     message = "No tienes permisos de un profesor"
 
     def has_permission(self, request, view):
-        try: 
+        try:
             professor = Professor.objects.get(user=request.user)
             if request.method == DELETE:
                 return False
@@ -26,6 +27,36 @@ class IsProfessor(permissions.BasePermission):
             else:
                 return True
         except Professor.DoesNotExist:
+            return False
+
+class IsCoordinator(permissions.BasePermission):
+    """
+    Clase para verificar si un usuario es coordinador o no
+    """
+
+    message = "No tienes permisos de un coordinador"
+
+    def has_permission(self, request, view):
+        try:
+            User.objects.get(id=request.user.pk, is_coordinator=True)
+            return True
+        except User.DoesNotExist:
+            return False
+
+class IsCoordinator_user(permissions.BasePermission):
+    """
+    Clase para verificar si un usuario es coordinador o no
+    """
+
+    message = "No tienes permisos de un coordinador"
+
+    def has_permission(self, request, view):
+        try:
+            User.objects.get(id=request.user.pk, is_coordinator=True)
+            if request.method == POST:
+                return True
+            return True
+        except User.DoesNotExist:
             return False
 
 class IsDirector_C(permissions.BasePermission):
@@ -111,7 +142,7 @@ class IsStudent(permissions.BasePermission):
         except Student.DoesNotExist:
             return False
 
-class IsCoordinator(permissions.BasePermission):
+class IsCoordinator2(permissions.BasePermission):
     """
     Clase que permite determinar si un usuario es del comite de coordinadores
     """

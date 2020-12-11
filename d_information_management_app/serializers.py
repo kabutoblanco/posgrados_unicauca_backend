@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import (Country, State, City, Institution, Professor, Faculty, Department, InvestigationGroup, 
                     KnowledgeArea, InvestigationLine, WorksDepartm, ManageInvestLine, ManageInvestGroup, 
-                    WorksInvestGroup, AcademicTraining, IsMember, WorksDepartm)
+                    WorksInvestGroup, AcademicTraining, IsMember, WorksDepartm, CoordinatorProgram)
 
 # Create your serializers here.
 # --------------------------------------------------Arias

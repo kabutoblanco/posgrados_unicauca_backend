@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
-from d_accounts_app.backend import IsProfessor, IsCoordinator
+from d_accounts_app.backends import IsProfessor, IsCoordinator
 from d_accounts_app.models import User
 from a_students_app.models import StudentGroupInvestigation
 
