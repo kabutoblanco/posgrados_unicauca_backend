@@ -2,11 +2,17 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Permission, AbstractUser
 
+
 # Create your models here.
+# MODIFICACIÓN DEL MODELO DE USUARIO POR DEFECTO DE DJANGO, INCLUYE:
+    # - username
+    # - email
+    # - first_name, last_name
+    # - password
+    # - is_active
+# POR DEFECTO, EL username ES USADO PARA EL LOGIN
 
-#def ValidatePersonalID():
-
-
+# Create your models here.
 class User(AbstractUser):
     ID_CHOICES = (
         (1, _("CEDULA")),
@@ -22,7 +28,7 @@ class User(AbstractUser):
     address = models.CharField(verbose_name='Direccion', max_length=64)
     is_coordinator = models.BooleanField(verbose_name="Es Coordinador", default=False)
     is_proffessor = models.BooleanField(verbose_name='Es profesor', default=False)
-    is_student = models.BooleanField(verbose_name='Es estudiante', default=True)
+    is_student = models.BooleanField(verbose_name='Es estudiante', default=False)
 
     class Meta:
         indexes = [

@@ -15,8 +15,11 @@ class Country(models.Model):
     - - - - -
     name : string[30]
         Nombre del pais
+    status: Boolean
+        Determina el estado del pais ([True]activo o [False]inactivo)
     """
     name = models.CharField(max_length=30, blank=False, null=False)
+    status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Pais'
         verbose_name_plural = 'Paises'
@@ -34,10 +37,12 @@ class State(models.Model):
         Nombre del departamento
     country : int
         Referencia a un pais
+    status: Boolean
+        Determina el estado del departamento ([True]activo o [False]inactivo)
     """
     name = models.CharField(max_length=30, blank=False, null=False)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=False, null=True)
-    
+    status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Departamento'
         verbose_name_plural = 'Departamentos'
@@ -55,10 +60,12 @@ class City(models.Model):
         Nombre de la ciudad
     state : int
         Referencia a un departamento de un pais
+    status: Boolean
+        Determina el estado de la ciudad ([True]activo o [False]inactivo)
     """
     name = models.CharField(max_length=30, blank=False, null=False)
     state = models.ForeignKey(State, on_delete=models.SET_NULL, blank=False, null=True)
-
+    status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Ciudad'
         verbose_name_plural = 'Ciudades'
@@ -76,10 +83,12 @@ class Institution(models.Model):
         Nombre de la institucion
     city : int
         Referencia a una ciudad en la cual se encuentra la institucion
+    status: Boolean
+        Determina el estado de la institucion ([True]activo o [False]inactivo)
     """
     name_inst = models.CharField(max_length=30, blank=False, null=False)
     city = models.ForeignKey(City, on_delete=models.SET_NULL, blank=False, null=True)
-
+    status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Institucion'
         verbose_name_plural = 'Instituciones'
@@ -97,10 +106,12 @@ class Faculty(models.Model):
         Nombre del departamento
     institution : int
         Referencia a una institucion registrada
+    status: Boolean
+        Determina el estado de la facultad ([True]activo o [False]inactivo)
     """
     name = models.CharField(max_length=30, blank=False, null=False)
     institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
-
+    status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Facultad'
         verbose_name_plural = 'Facultades'
@@ -118,10 +129,12 @@ class Department(models.Model):
         Nombre del departamento de la universidad
     faculty : int
         Referencia a una facultad de una universidad
+    status: Boolean
+        Determina el estado del departamento ([True]activo o [False]inactivo)
     """
     name = models.CharField(max_length=30, blank=False, null=False)
     faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, blank=False, null=True)
-
+    status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Departamento de la universidad'
         verbose_name_plural = 'Departamentos de la universidad'
@@ -147,6 +160,8 @@ class Professor(models.Model):
         Estado de la relacion en la cual el profesor es director o no de un grupo de investigacion
     is_internal : boolean
         Estado de la relacion en la cual el profesor es interno o no en la universidad
+    status: Boolean
+        Determina el estado del profesor ([True]activo o [False]inactivo)
     """
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=False, null=True)
     institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
@@ -154,7 +169,7 @@ class Professor(models.Model):
     is_director_student = models.BooleanField(default=False)
     is_director_gi = models.BooleanField(default=False)
     is_internal = models.BooleanField(default=False)
-
+    status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Profesor'
         verbose_name_plural = 'Profesores'
@@ -210,13 +225,15 @@ class InvestigationGroup(models.Model):
         Email del grupo de investigacion
     foundation_date : date
         Fecha de fundacion del grupo de investigacion
+    status: Boolean
+        Determina el estado del grupo de investigacion ([True]activo o [False]inactivo)
     """
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=False, null=True)
     name = models.CharField(max_length=50)
     category = models.CharField(max_length=50)
     email = models.EmailField()
     foundation_date = models.DateField()
-
+    status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Grupo de investigación'
         verbose_name_plural = 'Grupos de investigación'
@@ -234,10 +251,12 @@ class KnowledgeArea(models.Model):
         Nombre del grupo del area de conocimiento
     description : string[500]
         Espacio para una descripcion del area de conocimiento
+    status: Boolean
+        Determina el estado del area de conocimiento ([True]activo o [False]inactivo)
     """
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
-
+    status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Area del conocimiento'
         verbose_name_plural = 'Areas del conocimiento'
@@ -257,11 +276,13 @@ class InvestigationLine(models.Model):
         Nombre de la linea de investigacion
     description : string[500]
         Espacio para una descripcion del area de conocimiento
+    status: Boolean
+        Determina el estado de la linea de investigacion ([True]activo o [False]inactivo)
     """
     know_area = models.ForeignKey(KnowledgeArea, on_delete=models.SET_NULL, blank=False, null=True)
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
-
+    status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Linea de investigación'
         verbose_name_plural = 'Lineas de investigación'
@@ -285,12 +306,12 @@ class WorksInvestGroup(models.Model):
     """
     inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.SET_NULL, blank=False, null=True)
     know_area = models.ForeignKey(KnowledgeArea, on_delete=models.SET_NULL, blank=False, null=True)
-    study_status = models.BooleanField()
+    study_status = models.BooleanField(default=True, blank=False, null=False)
 
     class Meta:
         verbose_name = 'Trabaja'
         verbose_name_plural = 'Trabaja'
-    
+
     def __str__(self):
         return "{} trabaja en {}".format(self.inv_group, self.know_area)
 
@@ -303,14 +324,14 @@ class ManageInvestLine(models.Model):
     - - - - -
     inv_line : int
         Referencia a una linea de investigacion
-    profesor : int
+    professor : int
         Referencia a un profesor
     analysis_state : boolean
         Estado de la relacionen en la cual el profesor maneja o no una linea de investigacion
     """
     inv_line = models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True, default=1)
     professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True, default=1)
-    analysis_state = models.BooleanField()
+    analysis_state = models.BooleanField(default=True, blank=False, null=False)
 
     class Meta:
         verbose_name = 'Maneja'
@@ -332,7 +353,7 @@ class ManageInvestGroup(models.Model):
     """
     inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.SET_NULL, blank=False, null=True, default=1)
     professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True, default=1)
-    direction_state = models.BooleanField()
+    direction_state = models.BooleanField(default=True, blank=False, null=False)
     
     class Meta:
         verbose_name = 'Dirige'
@@ -354,7 +375,7 @@ class IsMember(models.Model):
     """
     professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
     inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.SET_NULL, blank=False, null=True)
-    member_status = models.BooleanField()
+    member_status = models.BooleanField(default=True, blank=False, null=False)
 
     class Meta:
         verbose_name = 'Es Miembro'
@@ -363,6 +384,7 @@ class IsMember(models.Model):
     def __str__(self):
         return "{} es miembro de {}".format(self.professor, self.inv_group)
 
+#labora falta todo, solo esta el modelo
 class WorksDepartm(models.Model):
     """
     Clase usada para tener el registro de la relacion entre un profesor y un departamento de la universidad en el cual
@@ -383,7 +405,7 @@ class WorksDepartm(models.Model):
     professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=False, null=True)
     laboral_category = models.CharField(max_length=50, blank=False, null=False)
-    laboral_state = models.BooleanField(default=False)
+    laboral_state = models.BooleanField(default=True, blank=False, null=False)
 
     class Meta:
         verbose_name = 'Labora'

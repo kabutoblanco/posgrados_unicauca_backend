@@ -1,32 +1,39 @@
 from rest_framework import serializers
 from .models import (Country, State, City, Institution, Professor, Faculty, Department, InvestigationGroup, 
                     KnowledgeArea, InvestigationLine, WorksDepartm, ManageInvestLine, ManageInvestGroup, 
-                    WorksInvestGroup, AcademicTraining, IsMember)
+                    WorksInvestGroup, AcademicTraining, IsMember, WorksDepartm)
 
 # Create your serializers here.
 # --------------------------------------------------Arias
 
-class CountrySerializer(serializers.Serializer):
-    id = serializers.ReadOnlyField()
-    name = serializers.CharField()
+#País
+class CountrySerializer(serializers.ModelSerializer):
+    status = serializers.BooleanField(required=False)
+    class Meta:
+        model = Country
+        fields = "__all__"
 
     def create(self, validate_data):
-        instance = Country()
-        instance.name = validate_data.get('name')
+        instance = Country.objects.create(**validate_data)
         instance.save()
         return instance
 
+#Estado o Departamento
 class StateSerializer(serializers.ModelSerializer):
+    status = serializers.BooleanField(required=False)
     class Meta:
         model = State
         fields = "__all__"
 
     def create(self, validate_data):
         instance = State.objects.create(**validate_data)
-        instance.save()
+        #instance.save()
+        print("Serializer en state: ",instance)
         return instance
 
+#Ciudad
 class CitySerializer(serializers.ModelSerializer):
+    status = serializers.BooleanField(required=False)
     class Meta:
         model = City
         fields = "__all__"
@@ -36,7 +43,9 @@ class CitySerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+#Institución
 class InstitutionSerializer(serializers.ModelSerializer):
+    status = serializers.BooleanField(required=False)
     class Meta:
         model = Institution
         fields = "__all__"
@@ -46,7 +55,12 @@ class InstitutionSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+#Profesor
 class ProfessorSerializer(serializers.ModelSerializer):
+    is_director_student = serializers.BooleanField(required=False)
+    is_director_gi = serializers.BooleanField(required=False)
+    is_internal = serializers.BooleanField(required=False)
+    status = serializers.BooleanField(required=False)
     class Meta:
         model = Professor
         fields = "__all__"
@@ -56,7 +70,9 @@ class ProfessorSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+#Facultad
 class FacultySerializer(serializers.ModelSerializer):
+    status = serializers.BooleanField(required=False)
     class Meta:
         model = Faculty
         fields = "__all__"
@@ -66,7 +82,9 @@ class FacultySerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+#Departamento 
 class DepartmentSerializer(serializers.ModelSerializer):
+    status = serializers.BooleanField(required=False)
     class Meta:
         model = Department
         fields = "__all__"
@@ -75,7 +93,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
         instance = Department.objects.create(**validate_data)
         instance.save()
         return instance
-
+#Formación Academica
 class AcademicTrainingSerializer(serializers.ModelSerializer):
     class Meta:
         model = AcademicTraining
@@ -89,30 +107,41 @@ class AcademicTrainingSerializer(serializers.ModelSerializer):
 # Create your serializers here.
 # --------------------------------------------------Jeison
 
-
+#Grupo de investigacion
 class InvestigationGroupSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False)
+    foundation_date = serializers.DateField(required=False)
+    category = serializers.CharField(required=False)
+    status = serializers.BooleanField(required=False)
     class Meta:
         model = InvestigationGroup
-        fields = "__all__"# ['campo1','campo2']
+        fields = "__all__"
     
     def create(self, validate_data):
         instance = InvestigationGroup.objects.create(**validate_data)
         instance.save()
         return instance
 
-class KnowledgeAreaSerializer(serializers.Serializer):
-    id = serializers.ReadOnlyField()
-    name = serializers.CharField()
-    description = serializers.CharField()
+#Area del conocimiento
+class KnowledgeAreaSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
+    status = serializers.BooleanField(required=False)
+    class Meta:
+        model = KnowledgeArea
+        fields = "__all__"
 
     def create(self, validate_data):
-        instance = KnowledgeArea()
-        instance.name = validate_data.get('name')
-        instance.description = validate_data.get('description')
+        instance = KnowledgeArea.objects.create(**validate_data)
         instance.save()
         return instance
 
+#Linea de investigacion
 class InvestigationLineSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
+    status = serializers.BooleanField(required=False)
     class Meta:
         model = InvestigationLine
         fields = "__all__"
@@ -122,6 +151,7 @@ class InvestigationLineSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+#Trabaja
 class WorksInvestGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorksInvestGroup
@@ -132,6 +162,7 @@ class WorksInvestGroupSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+#Maneja
 class ManageInvestLineSerializer(serializers.ModelSerializer):
     class Meta:
         model = ManageInvestLine
@@ -142,6 +173,7 @@ class ManageInvestLineSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+#Dirige
 class ManageInvestGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = ManageInvestGroup
@@ -162,3 +194,26 @@ class IsMemberSerializer(serializers.ModelSerializer):
         instance = IsMember.objects.create(**validate_data)
         instance.save()
         return instance
+
+class WorksDepartmSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorksDepartm
+        fields = '__all__'
+
+    def create(self, validate_data):
+        instance = WorksDepartm.objects.create(**validate_data)
+        instance.save()
+        return instance
+
+class CoordinatorProgramSerializer(serializers.ModelSerializer):
+    is_active = serializers.BooleanField(required=False)
+    academic_period = serializers.CharField(required=False)
+    class Meta:
+        model = CoordinatorProgram
+        fields = ['professor', 'program', 'academic_period', 'is_active']
+    
+    def create(self, validate_data):
+        instance = CoordinatorProgram.objects.create(**validate_data)
+        instance.save()
+        return instance
+

@@ -6,6 +6,10 @@ from knox.models import AuthToken
 from .models import User
 from .serializers import *
 
+from d_information_management_app.models import Professor, ManageInvestGroup, CoordinatorProgram
+from c_tracking_app.models import ActivityProfessor
+from a_students_app.models import Student, StudentProfessor
+
 #region loguin
 class UserAPI(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -46,40 +50,53 @@ class CreateUserAPI(generics.GenericAPIView):
 class ConsultUserAPI(APIView):
     def get(self, request, *args, **kwargs):
         queryset = User.objects.all()
-        return Response({"Users": CreateUserSerializer(queryset, many=True).data })
+        return Response({"Users": ConsultUserSerializer(queryset, many=True).data })
 
 class ConsultUser_PersonalAPI(APIView):
     def get(self, request, *args, **kwargs):
         queryset = User.objects.filter(personal_id=kwargs['id'])
-        return Response({"Users": CreateUserSerializer(queryset, many=True).data })
+        return Response({"Users": ConsultUserSerializer(queryset, many=True).data })
 
 class ConsultUser_idAPI(APIView):
     def get(self, request, *args, **kwargs):
         queryset = User.objects.filter(id=kwargs['id'])
-        return Response({"Users": CreateUserSerializer(queryset, many=True).data })
+        return Response({"Users": ConsultUserSerializer(queryset, many=True).data })
 
+    def put(self, request, *args, **kwargs):
+        try:
+            model = User.objects.get(id=kwargs['id'])
+        except User.DoesNotExist:
+            return Response(f"No existe el Usuario en la base de datos", status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UpdateUserSerializer(model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+   
 #endregion
 
 #region autenticacion usuarios
 class AuthUserAPI(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            Professor.objects.get(user=kwargs['id'])
+            Professor.objects.get(user=kwargs['id'], status=True)
             return Response(f"profesor")
         except Professor.DoesNotExist:
             try:
-                StudentProfessor.objects.get(professor__user=kwargs['id'])
+                ManageInvestGroup.objects.get(professor__user=kwargs['id'], professor__status=True)
                 return Response(f"director")
-            except StudentProfessor.DoesNotExist:
+            except ManageInvestGroup.DoesNotExist:
                 try:
-                    ActivityProfessor.objects.get(professor__user=kwargs['id'])
+                    CoordinatorProgram.objects.get(professor__user=kwargs['id'], professor__status=True)
                     return Response(f"coordinador")
-                except ActivityProfessor.DoesNotExist:
+                except CoordinatorProgram.DoesNotExist:
                     try:
-                        Student.objects.get(user=kwargs['id'])
+                        Student.objects.get(user=kwargs['id'], is_active=True)
                         return Response(f"estudiante")
                     except Student.DoesNotExist:
                         return Response(f"Usuario sin rol")
 
 
 #endregion
+
