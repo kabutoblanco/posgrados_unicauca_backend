@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from d_information_management_app.models import Professor
 from d_accounts_app.models import User
-from d_information_management_app.models import InvestigationGroup
+from d_information_management_app.models import InvestigationGroup, Department, Institution
 
 
 class GrantAgreement(models.Model):
@@ -44,7 +44,7 @@ class Grant(GrantAgreement):
 
 
 class Agreement(GrantAgreement):
-    agreement_date = models.IntegerField(default=0)
+    agreement_date = models.DateField(auto_now=False)
     period_academic = models.CharField(max_length=12)
     percentage_discount = models.FloatField(default=0.0)
     observation = models.CharField(max_length=148)
@@ -60,7 +60,7 @@ class Agreement(GrantAgreement):
 
 class Program(models.Model):
     name = models.CharField(max_length=148)
-
+    deparment = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=True, null=True)
     class Meta:
         verbose_name = 'Programa'
         verbose_name_plural = 'Programas'
@@ -71,11 +71,13 @@ class Program(models.Model):
 
 class Student(models.Model):
     DEDICATION_CHOICE = ((1, _("COMPLETO")), (2, _("PARCIAL")))
-    
     dedication = models.IntegerField(choices=DEDICATION_CHOICE, default=1)
+    academic_title=models.CharField(max_length=50)
+    
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     program = models.ForeignKey(Program, on_delete=models.SET_NULL, blank=True, null=True)
+    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -119,6 +121,7 @@ class StudentProfessor(models.Model):
 
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='estudiante')
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE, verbose_name='profesor')
+    
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -127,17 +130,19 @@ class StudentProfessor(models.Model):
     class Meta:
         verbose_name = 'Director/Coodirectores'
         verbose_name_plural = 'Directores/Coodirector'
+        
+
+        
 
     def __str__(self):
         return '[{}] {} | {} | {}'.format(self.id, self.student, self.professor, self.rol)
 
 
 class StudentGroupInvestigation(models.Model):
-    membership_start_date = models.DateField(auto_now=False)
-    membership_end_date = models.DateField(auto_now=False)
-
+    ##Hacer api     
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='estudiante')
     investigation_group = models.ForeignKey(InvestigationGroup, on_delete=models.CASCADE, verbose_name='grupo de investigacion')
+    memberstatus = models.BooleanField(default=True)
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -146,7 +151,7 @@ class StudentGroupInvestigation(models.Model):
     class Meta:
         verbose_name = 'Mis grupos de investigacion'
         verbose_name_plural = 'Mi grupo de investigacion'
-
+       
     def __str__(self):
         return '[{}] {} | {}'.format(self.id, self.student, self.investigation_group)
 

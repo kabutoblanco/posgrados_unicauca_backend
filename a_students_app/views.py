@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 from .models import Student,Enrrollment,Program, StudentProfessor,Agreement,Grant
-from .serializers import StudentSerializer, UserSerializer, EnrrollmentSerializer, GrantSerializer, AgreementSerializer,ProgramSerializer, StudentProfessorSerializer
+from .serializers import StudentSerializer, UserSerializer, EnrrollmentSerializer, GrantSerializer, AgreementSerializer,ProgramSerializer
 from d_accounts_app.models import User
 
 class StudentViewSet(ModelViewSet):
@@ -21,9 +21,7 @@ class ProgramViewSet(ModelViewSet):
     queryset = Program.objects.all()
     serializer_class = ProgramSerializer
 
-class StudentProfessortViewSet(ModelViewSet):
-    queryset = StudentProfessor.objects.all()
-    serializer_class = StudentProfessorSerializer
+
 
 class GrantViewSet(ModelViewSet):
     queryset = Grant.objects.all()
