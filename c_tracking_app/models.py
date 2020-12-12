@@ -2,9 +2,11 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 
-from d_information_management_app.models import Professor
+from d_information_management_app.models import Professor, CoordinatorProgram
 from b_activities_app.models import Activity
 from a_students_app.models import Student, Enrrollment
+from .email import send_email, send_email1
+
 
 class TestCoordinator(models.Model):
     """
@@ -30,12 +32,16 @@ class TestCoordinator(models.Model):
     - - - - - 
     void
     """
-    
-    credits = models.IntegerField(default=0, verbose_name='creditos')  
-    observations = models.CharField(max_length=148, blank=True, verbose_name='observaciones')
 
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='actividad')
-    coordinator = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='profesor')
+    credits = models.IntegerField(default=0, verbose_name='creditos')
+    observations = models.CharField(
+        max_length=148, blank=True, verbose_name='observaciones')
+    is_save = models.BooleanField(default=True)
+
+    activity = models.ForeignKey(
+        Activity, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='actividad')
+    coordinator = models.ForeignKey(
+        Professor, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='profesor')
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -44,6 +50,7 @@ class TestCoordinator(models.Model):
     class Meta:
         verbose_name = 'Evaluación del coordinador'
         verbose_name_plural = 'Evaluaciónes de los coordinadores'
+        unique_together = ("activity", "coordinator")
 
     def __str__(self):
         return '[{}] {}'.format(self.id, self.activity)
@@ -76,11 +83,16 @@ class TestDirector(models.Model):
 
     VALUE_CHOICES = ((1, _("FAVORABLE")), (2, _("NO_FAVORABLE")))
 
-    value = models.IntegerField(choices=VALUE_CHOICES, default=1, verbose_name='calificacion')
-    observations = models.CharField(max_length=148, blank=True, verbose_name='observacion')
+    value = models.IntegerField(
+        choices=VALUE_CHOICES, default=1, verbose_name='calificacion')
+    observations = models.CharField(
+        max_length=148, blank=True, verbose_name='observacion')
+    is_save = models.BooleanField(default=True)
 
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='actividad')
-    director = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='profesor')
+    activity = models.ForeignKey(
+        Activity, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='actividad')
+    director = models.ForeignKey(
+        Professor, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='profesor')
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -89,6 +101,7 @@ class TestDirector(models.Model):
     class Meta:
         verbose_name = 'Evaluación del director'
         verbose_name_plural = 'Evaluaciones de los directores'
+        unique_together = ("activity", "director")
 
     def __str__(self):
         return '[{}] {}'.format(self.id, self.activity)
@@ -131,17 +144,26 @@ class Tracking(models.Model):
 
     TYPE_CHOICES = ((1, _("ACTIVO")), (2, _("INACTIVO")),
                     (3, _("GRADUADO")), (4, _("BALANCEADO")), (5, _("RETIRADO")))
-    
-    status = models.IntegerField(choices=TYPE_CHOICES, default=1, verbose_name='estado')
-    enrrollment_date = models.DateField(auto_now=False, blank=True, null=True, verbose_name='fecha de matricula')
-    graduation_date = models.DateField(auto_now=False, blank=True, null=True, verbose_name='fecha de graduación')
-    num_folio = models.CharField(max_length=24, blank=True, verbose_name='numero de folio')
-    num_acta = models.CharField(max_length=24, blank=True, verbose_name='numero de acta')
-    num_diploma = models.CharField(max_length=24, blank=True, verbose_name='numero de diploma')
-    num_resolution = models.CharField(max_length=24, blank=True, verbose_name='numero de resolucion')
-    observations = models.CharField(max_length=148, blank=True, verbose_name='observaciones')
 
-    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='estudiante')
+    status = models.IntegerField(
+        choices=TYPE_CHOICES, default=1, verbose_name='estado')
+    enrrollment_date = models.DateField(
+        auto_now=False, blank=True, null=True, verbose_name='fecha de matricula')
+    graduation_date = models.DateField(
+        auto_now=False, blank=True, null=True, verbose_name='fecha de graduación')
+    num_folio = models.CharField(
+        max_length=24, blank=True, verbose_name='numero de folio')
+    num_acta = models.CharField(
+        max_length=24, blank=True, verbose_name='numero de acta')
+    num_diploma = models.CharField(
+        max_length=24, blank=True, verbose_name='numero de diploma')
+    num_resolution = models.CharField(
+        max_length=24, blank=True, verbose_name='numero de resolucion')
+    observations = models.CharField(
+        max_length=148, blank=True, verbose_name='observaciones')
+
+    student = models.ForeignKey(
+        Student, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='estudiante')
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -154,6 +176,7 @@ class Tracking(models.Model):
     def __str__(self):
         return '[{}] {} | {} |'.format(self.id, self.student, self.status)
 
+
 def create_customer(sender, instance, created, **kwargs):
     if created:
         try:
@@ -164,6 +187,7 @@ def create_customer(sender, instance, created, **kwargs):
             queryset.save()
         except:
             pass
+
 
 post_save.connect(create_customer, sender=Tracking)
 
@@ -186,11 +210,15 @@ class ActivityProfessor(models.Model):
     void
     """
 
-    TYPE_CHOICES = ((1, _("DIRECTOR")), (2, _("COODIRECTOR")), (3, _("COORDINADOR")))
+    TYPE_CHOICES = ((1, _("DIRECTOR")), (2, _("COODIRECTOR")),
+                    (3, _("COORDINADOR")))
 
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, verbose_name='actividad')
-    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, verbose_name='profesor')
-    rol = models.IntegerField(choices=TYPE_CHOICES, default=1, verbose_name='rol')
+    activity = models.ForeignKey(
+        Activity, on_delete=models.CASCADE, verbose_name='actividad')
+    professor = models.ForeignKey(
+        Professor, on_delete=models.CASCADE, verbose_name='profesor')
+    rol = models.IntegerField(choices=TYPE_CHOICES,
+                              default=1, verbose_name='rol')
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -202,3 +230,34 @@ class ActivityProfessor(models.Model):
 
     def __str__(self):
         return '[{}] {} | {} | {}'.format(self.id, self.activity, self.professor, self.rol)
+
+
+def save_or_send_testdirector(sender, instance, created, **kwargs):
+    # try:
+    if not instance.is_save:
+        # envia email                
+        queryset = CoordinatorProgram.objects.filter(
+            program=instance.activity.student.program).order_by('-academic_period')[:1]
+        queryset = Professor.objects.get(id=queryset[0].professor.id)
+        professor_activity = ActivityProfessor(activity=instance.activity, professor=queryset, rol=3)
+        professor_activity.save()
+        send_email(queryset, instance)
+    # except:
+    #     print('error')
+
+
+post_save.connect(save_or_send_testdirector, sender=TestDirector)
+
+
+def save_or_send_testcoordinator(sender, instance, created, **kwargs):
+    # try:
+    if not instance.is_save:
+        # envia email
+        queryset = Professor.objects.get(pk=instance.coordinator.id)
+        student = Student.objects.get(pk=instance.activity.student.id)
+        send_email1(queryset, student, instance)
+    # except:
+    #     pass
+
+
+post_save.connect(save_or_send_testcoordinator, sender=TestCoordinator)

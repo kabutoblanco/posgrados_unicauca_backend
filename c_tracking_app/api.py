@@ -6,6 +6,7 @@ from a_students_app.models import StudentProfessor
 from .backends import IsDirector, IsCoordinador
 from django.db.models import Avg, Sum, Count, Q
 from rest_framework.permissions import IsAuthenticated
+from .email import send_email
 
 
 # - - - - - PRIMER SPRINT - - - - -
@@ -82,7 +83,7 @@ class ActivityAPI(generics.RetrieveAPIView):
         El usuario debe tener un token que lo valide
     """
 
-    # permission_classes = [IsAuthenticated, (IsDirector | IsCoordinador)]
+    # permission_classes = [IsAuthenticated]
     serializer_class = ActivitySerializer
 
     def get(self, request, *args, **kwargs):
@@ -154,8 +155,6 @@ class DirectorActiviesAPI(generics.RetrieveAPIView):
         El usuario debe tener un token que lo valide
     IsDirector
         El usuario debe tener a cargo al menos un estudiante como director o coodirector
-    IsCoordinator
-        El usuario debe tener a cargo al menos una actividad como coordinator
     """
 
     # permission_classes = (IsAuthenticated, IsDirector)
@@ -171,7 +170,7 @@ class DirectorActiviesAPI(generics.RetrieveAPIView):
         return Response({"activities": ActivitySerializer(queryset_list, many=True).data})
 
 
-class ActivityCoordinatorAPI(generics.RetrieveAPIView):
+class CoordinatorActivitiesAPI(generics.RetrieveAPIView):
     """
     API usada para obtener las actividades que un coordinador tiene a cargo
     - - - - -
@@ -189,7 +188,6 @@ class ActivityCoordinatorAPI(generics.RetrieveAPIView):
     serializer_class = ActivitySerializer
 
     def intersection(self, lst1, lst2):
-        print(lst2)
         temp = set(lst2)
         lst3 = [value for value in lst1 if value in temp]
         return lst3
@@ -245,7 +243,7 @@ class TestCoordinatorAPI(viewsets.ModelViewSet):
 
 class TestDirectorListAPI(generics.RetrieveAPIView):
     """
-    API usada para obtener todas las evaluaciones de una actividad
+    API usada para obtener todas las evaluaciones de un director
     - - - - -
     Permissions
     - - - - -
@@ -259,21 +257,22 @@ class TestDirectorListAPI(generics.RetrieveAPIView):
     serializer_class = TestDirectorSerializer
 
     def get(self, request, *args, **kwargs):
+        print(kwargs['id_professor'])
         queryset = TestDirector.objects.filter(
-            is_active=True, activity=kwargs['id_activity'], director__user=kwargs['id_professor'])
+            is_active=True, director__user=kwargs['id_professor'])
         return Response({"test_activities": TestDirectorSerializer(queryset, many=True).data})
 
 
 class TestCoordinatorListAPI(generics.RetrieveAPIView):
     """
-    API usada para obtener todas las evaluaciones de una actividad
+    API usada para obtener todas las evaluaciones de un coordinador
     - - - - -
     Permissions
     - - - - -
     IsAuthenticated
         El usuario debe tener un token que lo valide
-    IsDirector
-        El usuario debe tener a cargo al menos un estudiante como director o coodirector
+    IsCoordinator
+        El usuario debe tener a cargo al menos un estudiante como coordinador
     """
 
     # permission_classes = [IsAuthenticated, IsCoordinador]
@@ -281,6 +280,6 @@ class TestCoordinatorListAPI(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         queryset = TestCoordinator.objects.filter(
-            is_active=True, activity=kwargs['id_activity'], coordinator__user=kwargs['id_professor'])
+            is_active=True, coordinator__user=kwargs['id_professor'])
         return Response({"test_activities": TestCoordinatorSerializer(queryset, many=True).data})
 # - - - - - TERCER SPRINT - - - - -

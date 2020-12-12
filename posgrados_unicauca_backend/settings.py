@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'knox',
     'corsheaders',
+    'openpyxl',
+    'reportlab'
 ]
 
 # REDEFINICIÓN DE LOS TOKENS CON KNOX

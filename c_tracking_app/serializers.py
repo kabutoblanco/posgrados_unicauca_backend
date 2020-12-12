@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Tracking, TestCoordinator, TestDirector
+from .models import Tracking, TestCoordinator, TestDirector, ActivityProfessor
 
 from a_students_app.models import Student, Enrrollment
 from b_activities_app.models import Activity
@@ -18,14 +18,6 @@ class TypeActiviyField(serializers.Field):
 
     def to_internal_value(self, data):
         return getattr(self._choices, data)
-
-
-class ActivitySerializer(serializers.ModelSerializer):
-    type = TypeActiviyField(choices=Activity.TYPE_CHOICES)
-
-    class Meta:
-        model = Activity
-        fields = ("id", "title", "description", "receipt", "state", "type", "start_date", "end_date", "academic_year")
 
 
 class ProgramSerializer(serializers.ModelSerializer):
@@ -48,6 +40,15 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = ('id', 'user', 'program')
+
+
+class ActivitySerializer(serializers.ModelSerializer):
+    type = TypeActiviyField(choices=Activity.TYPE_CHOICES)
+    student = StudentSerializer()
+
+    class Meta:
+        model = Activity
+        fields = ("id", "title", "student", "description", "receipt", "state", "type", "start_date", "end_date", "academic_year")
 
 
 class EnrrollmentSerializer(serializers.ModelSerializer):
