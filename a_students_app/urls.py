@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import StudentViewSet, UserViewSet, EnrrollmentViewSet,ProgramViewSet, GrantViewSet, AgreementViewSet
-from .api import CreateStudentProfessor,UpdateStudenAPI,UpdateGrantAPI,UpdateAgreementAPI
+from .api import CreateStudentProfessor,UpdateStudenAPI,UpdateGrantAPI,UpdateAgreementAPI, ReporteEstudiantesExcel
 router = DefaultRouter()
 router.register('student', StudentViewSet)
 router.register('user', UserViewSet)
@@ -19,5 +19,5 @@ urlpatterns = [
     path('updatestudent/<int:id>',UpdateStudenAPI.as_view()),
     path('updategrant/<int:id>',UpdateGrantAPI.as_view()),
     path('updateagreement/<int:id>',UpdateAgreementAPI.as_view()),
-
+    path('report/<int:type>',ReporteEstudiantesExcel.as_view())
     ]
