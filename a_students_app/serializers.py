@@ -54,7 +54,7 @@ class StudentSerializer(serializers.ModelSerializer):
   
     class Meta:
         model = Student
-        fields = ('id','dedication', 'program','date_record','date_update','user')
+        fields = ('id','dedication', 'program','academic_title','date_record','date_update','user')
     def create (self,validated_data):
         print("sdsadasda")
         user_data = validated_data.pop ('user')
@@ -75,8 +75,35 @@ class StudentSerializer(serializers.ModelSerializer):
 
 class UpdateStudentSerializer(serializers.ModelSerializer):
     dedication = serializers.IntegerField(required=False)
+    academic_title = serializers.CharField(required=False)
     
     class Meta:
         model = Student
-        fields = ('dedication', 'program','user')
+        fields = ('dedication', 'program','user','academic_title')
+
+class UpdateGrant(serializers.ModelSerializer):
+    long = serializers.IntegerField(required=False)
+    start_date = serializers.DateField(required=False)
+    end_date = serializers.DateField(required=False)
+    name = serializers.CharField(required=False)
+    announcement = serializers.IntegerField(required=False)
+    description = serializers.CharField(required=False)
+    num_resolution = serializers.CharField(required=False)
+    class Meta:
+        model = Grant
+        fields = ('long','start_date','end_date','name', 'announcement','description','num_resolution')
+
+class UpdateAgreement(serializers.ModelSerializer):
+    long = serializers.IntegerField(required=False)
+    start_date = serializers.DateField(required=False)
+    end_date = serializers.DateField(required=False)
+    agreement_date = serializers.DateField(required=False)
+    period_academic = serializers.CharField(required=False)
+    percentage_discount = serializers.FloatField(required=False)
+    observation = serializers.CharField(required=False)
+    class Meta:
+        model = Grant
+        fields = ('long','start_date','end_date','agreement_date', 'period_academic','percentage_discount','observation')
+    
+    
     
