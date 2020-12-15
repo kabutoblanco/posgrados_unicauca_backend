@@ -77,7 +77,7 @@ class Student(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     program = models.ForeignKey(Program, on_delete=models.SET_NULL, blank=True, null=True)
-    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
+    ##institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)

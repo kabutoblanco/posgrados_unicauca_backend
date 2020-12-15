@@ -102,7 +102,7 @@ class UpdateAgreement(serializers.ModelSerializer):
     percentage_discount = serializers.FloatField(required=False)
     observation = serializers.CharField(required=False)
     class Meta:
-        model = Grant
+        model = Agreement
         fields = ('long','start_date','end_date','agreement_date', 'period_academic','percentage_discount','observation')
     
     

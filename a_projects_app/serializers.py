@@ -16,3 +16,11 @@ class SpecificSerializer(serializers.ModelSerializer):
     class Meta:
         model = Specific
         fields = "__all__"
+
+class UpdateProject(serializers.ModelSerializer):
+    provisional_title = serializers.CharField(required=False)
+    objetive_topic = serializers.CharField(required=False)
+        
+    class Meta:
+        model = Project
+        fields = ('investigation_line','student','provisional_title','objetive_topic')
