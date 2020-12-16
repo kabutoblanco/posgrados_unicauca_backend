@@ -241,9 +241,18 @@ def save_or_send_testdirector(sender, instance, created, **kwargs):
         queryset = CoordinatorProgram.objects.filter(
             program=instance.activity.student.program).order_by('-academic_period')[:1]
         queryset = Professor.objects.get(id=queryset[0].professor.id)
+
+        queryset1 = Activity.objects.get(pk=instance.activity.id)
+        queryset1.state = 3
+        queryset1.save()
+
         professor_activity = ActivityProfessor(activity=instance.activity, professor=queryset, rol=3)
         professor_activity.save()
         send_email(queryset, instance)
+    else:
+        queryset1 = Activity.objects.get(pk=instance.activity.id)
+        queryset1.state = 2
+        queryset1.save()
     # except:
     #     print('error')
 
@@ -257,6 +266,9 @@ def save_or_send_testcoordinator(sender, instance, created, **kwargs):
         # envia email
         queryset = Professor.objects.get(pk=instance.coordinator.id)
         student = Student.objects.get(pk=instance.activity.student.id)
+        queryset1 = Activity.objects.get(pk=instance.activity.id)
+        queryset1.state = 4
+        queryset1.save()
         send_email1(queryset, student, instance)
     # except:
     #     pass
