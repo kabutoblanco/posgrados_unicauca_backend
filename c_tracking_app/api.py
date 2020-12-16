@@ -209,11 +209,6 @@ class CoordinatorActivitiesAPI(generics.RetrieveAPIView):
         queryset = ActivityProfessor.objects.filter(
             is_active=True, professor__user=kwargs['id_professor'], rol=3).values('activity')
         list = [e['activity'] for e in queryset]
-        queryset_1 = TestDirector.objects.filter(
-            is_active=True, activity__in=list).values('activity')[:1]
-        print(list)
-        list_1 = [e['activity'] for e in queryset_1]
-        list = self.intersection(list, list_1)
         queryset_list = Activity.objects.filter(is_active=True, id__in=list)
         return Response({"activities": ActivitySerializer(queryset_list, many=True).data})
 # - - - - - SEGUNDO SPRINT - - - - -
