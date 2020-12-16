@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
-from d_accounts_app.backends import IsProfessor, IsCoordinator
+from d_accounts_app.backend import IsProfessor, IsCoordinator
 from d_accounts_app.models import User
 from a_students_app.models import StudentGroupInvestigation
 
@@ -464,7 +464,6 @@ class ConsultCity_StateAPI(APIView):
         except City.DoesNotExist:
             return Response(f"No existe esa Ciudad en la base de datos", status=status.HTTP_404_NOT_FOUND)
         
-        print(request.data)
         serializer = CitySerializer(model, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -480,7 +479,7 @@ class ConsultInstitutionAPI(APIView):
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     """
     def get(self, request, *args, **kwargs):
-        queryset = Institution.objects.filter(status=True)
+        queryset = Institution.objects.filter(status=True, city__state__country__status=True)
         return Response({"Institutions": InstitutionSerializer(queryset, many=True).data })
 
 class ConsultInstitution_idAPI(APIView):
@@ -817,7 +816,7 @@ class ConsultInvestigationGroup_idAPI(APIView):
     Clase usada para la implementacion de la API para consultar y editar un Grupo de Investigacion
     espesifico de la Universidad, esto se logra enviando el ID del Grupo de investigacion mediante 
     el metodo GET y/o enviando la informacion que se va a editar del Grupo de Investigacion mediante
-    el metodo POST
+    el metodo PUT
     - - - - -
     Parameters
     - - - - -
@@ -900,7 +899,7 @@ class ConsultProfessor_idAPI(APIView):
     """
     Clase usada para la implementacion de la API para consultar y editar un Profesor espesifico
     de la Universidad, esto se logra enviando el ID del Profesor mediante el metodo GET y/o enviando
-    la informacion que se va a editar del Profesor mediante el metodo POST
+    la informacion que se va a editar del Profesor mediante el metodo PUT
     - - - - -
     Parameters
     - - - - -
@@ -965,7 +964,7 @@ class ConsultKnowledgeArea_idAPI(APIView):
     """
     Clase usada para la implementacion de la API para consultar y editar un Area del Conocimiento espesifica
     de la Universidad, esto se logra enviando el ID del Area del Conocimiento mediante el metodo GET y/o enviando
-    la informacion que se va a editar del Area del Conocimiento mediante el metodo POST
+    la informacion que se va a editar del Area del Conocimiento mediante el metodo PUT
     - - - - -
     Parameters
     - - - - -
@@ -1011,7 +1010,7 @@ class ConsultInvestigationLine_idAPI(APIView):
     """
     Clase usada para la implementacion de la API para consultar una Linea de Investigacion espesifica 
     de la Universidad, esto se logra enviando el ID de la Linea de Investigacion mediante el metodo GET 
-    y/o enviando la informacion que se va a editar de la Linea de Investigacion mediante el metodo POST
+    y/o enviando la informacion que se va a editar de la Linea de Investigacion mediante el metodo PUT
     - - - - -
     Parameters
     - - - - -
@@ -1044,7 +1043,7 @@ class ConsultIsMemberAPI(APIView):
     Clase usada para la implementacion de, la API para consultar si un profesor ES MIEMBRO o no de un 
     grupo de investigacion espesifico de la Universidad, esto se logra enviando el ID del Profesor y 
     el ID del Grupo de Investigacion (en ese orden) mediante el metodo GET y/o enviando la informacion 
-    que se va a editar del registro del modelo "Es Miembro" mediante el metodo POST
+    que se va a editar del registro del modelo "Es Miembro" mediante el metodo PUT
     - - - - -
     Parameters
     - - - - -
@@ -1061,7 +1060,7 @@ class ConsultIsMemberAPI(APIView):
         else:
             return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
     
-    def post(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         try:
             model = IsMember.objects.get(inv_group=kwargs['id_gi'], professor=kwargs['id_p'], member_status=True)
         except IsMember.DoesNotExist:
@@ -1078,7 +1077,7 @@ class ConsultWorksInvestGroupAPI(APIView):
     Clase usada para la implementacion de, la API para consultar si un Grupo de Investigacion TRABAJA o no en un
     Area del Conocimiento espesifica de la Universidad, esto se logra enviando el ID del Grupo de Investigacion y 
     el ID del Area del Conocimiento (en ese orden) mediante el metodo GET y/o enviando la informacion 
-    que se va a editar del registro del modelo "Trabaja" mediante el metodo POST
+    que se va a editar del registro del modelo "Trabaja" mediante el metodo PUT
     - - - - -
     Parameters
     - - - - -
@@ -1095,7 +1094,7 @@ class ConsultWorksInvestGroupAPI(APIView):
         else:
             return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
     
-    def post(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         try:
             model = WorksInvestGroup.objects.get(inv_group=kwargs['id_gi'], know_area=kwargs['id_ac'], study_status=True)
         except IsMember.DoesNotExist:
@@ -1121,7 +1120,7 @@ class ConsultManageInvestGroupAPI(APIView):
     Clase usada para la implementacion de, la API para consultar si un Profesor DIRIGE o no un
     Grupo de Investigacion espesifico de la Universidad, esto se logra enviando el ID del usuario del Profesor y 
     el ID del Grupo de Investigacion (en ese orden) mediante el metodo GET y/o enviando la informacion 
-    que se va a editar del registro del modelo "Dirige" mediante el metodo POST
+    que se va a editar del registro del modelo "Dirige" mediante el metodo PUT
     - - - - -
     Parameters
     - - - - -
@@ -1158,7 +1157,6 @@ class ConsultManageInvestGroupAPI(APIView):
                     oldProfessor = Professor.objects.get(id=kwargs['id_p'])
                     oldProfessor.is_director_gi = False
                     oldProfessor.save()
-            print(">>>>>>>>>>>>>>>>>>>>>> ",serializer)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -1275,7 +1273,7 @@ class ConsultManageInvestLineAPI(APIView):
     Clase usada para la implementacion de, la API para consultar si un Profesor MANEJA o no una
     Linea de investigacion espesifica, esto se logra enviando el ID del Profesor y el ID de la 
     Linea de investigacion (en ese orden) mediante el metodo GET y/o enviando la informacion
-    que se va a editar del registro del modelo "maneja" mediante el metodo POST
+    que se va a editar del registro del modelo "maneja" mediante el metodo PUT
     - - - - -
     Parameters
     - - - - -
@@ -1346,7 +1344,7 @@ class ConsultWorksDepartmAPI(APIView):
     Clase usada para la implementacion de, la API para consultar si un Profesor LABORA o no un
     Departamento espesifico de la Universidad, esto se logra enviando el ID del Profesor y 
     el ID del Departamento (en ese orden) mediante el metodo GET y/o enviando la informacion 
-    que se va a editar del registro del modelo "Labora" mediante el metodo POST
+    que se va a editar del registro del modelo "Labora" mediante el metodo PUT
     - - - - -
     Parameters
     - - - - -
@@ -1418,7 +1416,7 @@ class ConsultAcademicTrainingAPI(APIView):
     Clase usada para la implementacion de, la API para consultar la FORMACION ACADEMICA de un
     Profesor espesifico de la Universidad, esto se logra enviando el ID de la Formacion Academica
     correspondiente mediante el metodo GET y/o enviando la informacion que se va a editar del
-    registro del modelo "Formacion academica" mediante el metodo POST
+    registro del modelo "Formacion academica" mediante el metodo PUT
     - - - - -
     Parameters
     - - - - -

@@ -79,23 +79,30 @@ class ConsultUser_idAPI(APIView):
 #region autenticacion usuarios
 class AuthUserAPI(APIView):
     def get(self, request, *args, **kwargs):
+        typeList = ["Usuario sin rol"]
+        try:
+            CoordinatorProgram.objects.get(professor__user=kwargs['id'], professor__status=True)
+            typeList.append("coordinador")
+        except CoordinatorProgram.DoesNotExist:
+            print("No es coordinador")
+        try:
+            ManageInvestGroup.objects.get(professor__user=kwargs['id'], professor__status=True)
+            typeList.append("director")
+        except ManageInvestGroup.DoesNotExist:
+            print("No es director")
         try:
             Professor.objects.get(user=kwargs['id'], status=True)
-            return Response(f"profesor")
+            typeList.remove("Usuario sin rol")
+            typeList.append("profesor")
         except Professor.DoesNotExist:
-            try:
-                ManageInvestGroup.objects.get(professor__user=kwargs['id'], professor__status=True)
-                return Response(f"director")
-            except ManageInvestGroup.DoesNotExist:
-                try:
-                    CoordinatorProgram.objects.get(professor__user=kwargs['id'], professor__status=True)
-                    return Response(f"coordinador")
-                except CoordinatorProgram.DoesNotExist:
-                    try:
-                        Student.objects.get(user=kwargs['id'], is_active=True)
-                        return Response(f"estudiante")
-                    except Student.DoesNotExist:
-                        return Response(f"Usuario sin rol")
+            print("No es profesor")
+        try:
+            Student.objects.get(user=kwargs['id'], is_active=True)
+            typeList.append("estudiante")
+        except Student.DoesNotExist:
+            return Response(typeList)
+        return Response(typeList)
+        
 
 
 #endregion

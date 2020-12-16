@@ -309,6 +309,7 @@ class WorksInvestGroup(models.Model):
     study_status = models.BooleanField(default=True, blank=False, null=False)
 
     class Meta:
+        unique_together = ("inv_group", "know_area")
         verbose_name = 'Trabaja'
         verbose_name_plural = 'Trabaja'
 
@@ -334,6 +335,7 @@ class ManageInvestLine(models.Model):
     analysis_state = models.BooleanField(default=True, blank=False, null=False)
 
     class Meta:
+        unique_together = ("professor", "inv_line")
         verbose_name = 'Maneja'
         verbose_name_plural = 'Maneja'
 
@@ -356,6 +358,7 @@ class ManageInvestGroup(models.Model):
     direction_state = models.BooleanField(default=True, blank=False, null=False)
     
     class Meta:
+        unique_together = ("professor", "inv_group")
         verbose_name = 'Dirige'
         verbose_name_plural = 'Dirige'
 
@@ -378,6 +381,7 @@ class IsMember(models.Model):
     member_status = models.BooleanField(default=True, blank=False, null=False)
 
     class Meta:
+        unique_together = ("professor", "inv_group")
         verbose_name = 'Es Miembro'
         verbose_name_plural = 'Son Miembros'
 
@@ -408,6 +412,7 @@ class WorksDepartm(models.Model):
     laboral_state = models.BooleanField(default=True, blank=False, null=False)
 
     class Meta:
+        unique_together = ("professor", "department")
         verbose_name = 'Labora'
         verbose_name_plural = 'Labora'
 
@@ -433,7 +438,7 @@ class CoordinatorProgram(models.Model):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = ("professor", "academic_period")
+        unique_together = ("professor", "academic_period", "program")
         verbose_name = "Coordinador"
         verbose_name_plural = "Coordinadores"
 
