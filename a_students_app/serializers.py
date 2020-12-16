@@ -105,5 +105,11 @@ class UpdateAgreement(serializers.ModelSerializer):
         model = Agreement
         fields = ('long','start_date','end_date','agreement_date', 'period_academic','percentage_discount','observation')
     
+class UpdateStudentProfessor(serializers.ModelSerializer):
+    rol = serializers.IntegerField(required=False)
+        
+    class Meta:
+        model = StudentProfessor
+        fields = ('student', 'professor','rol')
     
     

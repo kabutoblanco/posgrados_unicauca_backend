@@ -6,7 +6,10 @@ class Project(models.Model):
     
     provisional_title = models.CharField(max_length=40, blank=False, null=False)
     objetive_topic = models.CharField(max_length=80, blank=False, null=False)
+    objetive_generl = models.CharField(max_length=900, blank=False, null=False)
+    objetive_specific = models.CharField(max_length=900, blank=False, null=False)
     
+
     investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True)
     student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=True)
 
@@ -32,7 +35,7 @@ class Objetive(models.Model):
 
 class General(Objetive):
 
-    objetive_general = models.CharField(max_length=148, blank=False, null=False)
+    objetive_general = models.CharField(max_length=500, blank=False, null=False)
 
   
     class Meta:
@@ -40,11 +43,12 @@ class General(Objetive):
         verbose_name_plural='Objetivos generales'
 
 class Specific(Objetive):
+    objetive_specifico = models.CharField(max_length=500, blank=False, null=False)
+    #Revisar
 
-    
     class Meta:
         verbose_name='Objetivo especifico'
-        verbose_name_plural='Objetivos especificos'
+        verbose_name_plural='Objetivos especificos' 
 
 class DirectorControl(models.Model):
 
