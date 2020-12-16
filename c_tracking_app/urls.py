@@ -23,4 +23,6 @@ urlpatterns = [
 
     path('api/director/<int:id_professor>/test', TestDirectorListAPI.as_view()),
     path('api/coordinator/<int:id_professor>/test', TestCoordinatorListAPI.as_view()),
+
+    path('api/report/cohorte/<int:type>', ReportAPI.as_view())
 ]

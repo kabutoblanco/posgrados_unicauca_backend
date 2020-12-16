@@ -183,6 +183,8 @@ def create_customer(sender, instance, created, **kwargs):
             queryset = Enrrollment.objects.filter(
                 student__user=instance.student.user).order_by('-period')[:1]
             queryset = queryset[0]
+            if instance.status == 1 and instance.enrrollment_date is not None:
+                queryset.enrrollment_date = instance.enrrollment_date    
             queryset.state = instance.status
             queryset.save()
         except:
