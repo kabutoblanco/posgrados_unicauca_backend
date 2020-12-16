@@ -442,7 +442,7 @@ class ReportAPI(TemplateView):
             cohorte = Paragraph('''Cohorte''',styleBH)
             no_matriculados = Paragraph('''No. Matriculados''',styleBH)
             no_graduados = Paragraph('''No. Graduados''',styleBH)
-            por_matriculados = Paragraph('''% Matriculados''',styleBH)
+            por_matriculados = Paragraph('''% Graduados''',styleBH)
             data = []
             data.append([codigo, cohorte, no_matriculados, no_graduados, por_matriculados])
 
