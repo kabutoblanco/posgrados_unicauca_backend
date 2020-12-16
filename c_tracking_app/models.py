@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 
 from d_information_management_app.models import Professor, CoordinatorProgram
 from b_activities_app.models import *
-from a_students_app.models import Student, Enrrollment
+from a_students_app.models import Student, Enrrollment, StudentProfessor
 from .email import send_email, send_email1
 
 
