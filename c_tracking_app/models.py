@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 
 from d_information_management_app.models import Professor, CoordinatorProgram
-from b_activities_app.models import Activity
+from b_activities_app.models import *
 from a_students_app.models import Student, Enrrollment
 from .email import send_email, send_email1
 
@@ -275,3 +275,26 @@ def save_or_send_testcoordinator(sender, instance, created, **kwargs):
 
 
 post_save.connect(save_or_send_testcoordinator, sender=TestCoordinator)
+
+def save_or_send_activity(sender, instance, created, **kwargs):
+    # try:
+    print('22das')
+    if created:
+        # envia email
+        print('22das')
+        query = StudentProfessor.objects.filter(student=instance.student.id, rol=1).order_by('-id')[:1][0]
+        print(instance)
+        query = ActivityProfessor(rol=1, activity=instance, professor=query.professor)
+        query.save()
+    # except:
+    #     pass
+
+
+# post_save.connect(save_or_send_activity, sender=Activity)
+post_save.connect(save_or_send_activity, sender=Lecture)
+post_save.connect(save_or_send_activity, sender=Publication)
+post_save.connect(save_or_send_activity, sender=ProjectCourse)
+post_save.connect(save_or_send_activity, sender=ResearchStays)
+post_save.connect(save_or_send_activity, sender=PresentationResults)
+post_save.connect(save_or_send_activity, sender=ParticipationProjects)
+post_save.connect(save_or_send_activity, sender=Prize)
