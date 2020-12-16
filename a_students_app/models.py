@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+
 from d_information_management_app.models import Professor
 from d_accounts_app.models import User
 from d_information_management_app.models import InvestigationGroup, Department, Institution
@@ -128,6 +129,7 @@ class StudentProfessor(models.Model):
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        unique_together = ("student", "professor")
         verbose_name = 'Director/Coodirectores'
         verbose_name_plural = 'Directores/Coodirector'
         

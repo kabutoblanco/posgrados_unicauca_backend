@@ -2,7 +2,7 @@ from rest_framework import generics, permissions
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UpdateStudentSerializer,StudentSerializer,StudentProfessorSerializer, UpdateGrant, UpdateAgreement
+from .serializers import UpdateStudentSerializer,StudentSerializer,StudentProfessorSerializer, UpdateGrant, UpdateAgreement, UpdateStudentProfessor
 from .models import Student,StudentProfessor, Agreement, Grant, Enrrollment
 from d_information_management_app.models import Professor
 from d_accounts_app.models import User
@@ -178,6 +178,10 @@ class CreateStudentProfessor(generics.GenericAPIView):
         
         serializer= self.get_serializer(data=request.data)
         if serializer.is_valid():
+            
+            '''is_element = StudentProfessor.objects.filter(student=request.data["student"],professor=request.data["professor"])
+            if not (is_element):'''
+
             if (int(request.data["rol"])==1):
                 
                 isdirector= StudentProfessor.objects.filter(student=request.data["student"],
@@ -200,6 +204,10 @@ class CreateStudentProfessor(generics.GenericAPIView):
                     serializer.save()
                     return Response(serializer.data,status=status.HTTP_201_CREATED)
                 return Response(f"Ya cuenta con dos coodirectores",status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)            
+            
+
             
         
 
@@ -249,7 +257,20 @@ class UpdateAgreementAPI (APIView):
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+class UpdateStudentProfessorAPI (APIView):
+    def get (self,request,*args,**kwargs):
+        model= StudentProfessor.objects.filter(student=kwargs["id_s"],professor=kwargs["id_p"])
+        return Response(UpdateStudentProfessor(model, many=True).data,status=status.HTTP_202_ACCEPTED)
+    def put (self,request,*args,**kwargs):
+        try:
+            model = StudentProfessor.objects.get(student=kwargs["id_s"],professor=kwargs["id_p"])
+        except StudentProfessor.DoesNotExist:
+            return Response(f"Los codirectores y director solicitados no existe en la Base de Datos.",status= status.HTTP_404_NOT_FOUND)
+        serializer = UpdateStudentProfessor(model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
