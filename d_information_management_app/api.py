@@ -37,6 +37,8 @@ from reportlab.platypus import Table, TableStyle
 from a_students_app.models import Student,Enrrollment
 
 import datetime
+from datetime import datetime
+
 
 # Create your api's here.
 # --------------------------------------------------Arias
@@ -49,6 +51,7 @@ class ReportTest(APIView):
            
         year = kwargs["year"]
         queryset = Enrrollment.objects.filter(admission_date__range=(str(year)+"-1-1",str(year)+"-12-31"))
+        now = datetime.now()
 
         if(kwargs["type"]==1):#Format xlsx request.data["tipo"]==1
             wb = Workbook()
@@ -66,11 +69,11 @@ class ReportTest(APIView):
             #Change the characteristics of cells
             ws.merge_cells('B1:G1')
             ws.row_dimensions[1].height = 25
-            ws.column_dimensions['B'].width = 20
-            ws.column_dimensions['C'].width = 20
-            ws.column_dimensions['D'].width = 20
-            ws.column_dimensions['E'].width = 20
-            ws.column_dimensions['F'].width = 20
+            ws.column_dimensions['B'].width = 15
+            ws.column_dimensions['C'].width = 30
+            ws.column_dimensions['D'].width = 15
+            ws.column_dimensions['E'].width = 15
+            ws.column_dimensions['F'].width = 25
             ws.column_dimensions['G'].width = 20
             #Create header
             ws['B2'].alignment = Alignment(horizontal="center",vertical="center")
@@ -170,12 +173,13 @@ class ReportTest(APIView):
             buffer = BytesIO()
             c = canvas.Canvas(buffer, pagesize=A4)
 
+
             #Header
             c.setLineWidth(.3)
             c.setFont('Helvetica',22)
             c.drawString(30,750,'Reporte anual')
             c.setFont('Helvetica',12)
-            c.drawString(30,735,'Report')
+            c.drawString(30,735,str(now.year)+"-"+str(now.month)+"-"+str(now.day))
             c.setFont('Helvetica-Bold',12)
             c.drawString(460,750,str(year))
             c.line(460,747,560,747)
@@ -212,7 +216,7 @@ class ReportTest(APIView):
             
             #Table zise
             width, height = A4
-            table = Table(data, colWidths=[2.7*cm,6.9*cm,2.2*cm,2.2*cm,2.2*cm,2.7*cm])
+            table = Table(data, colWidths=[2.7*cm,5.4*cm,2.2*cm,2.2*cm,4.0*cm,2.7*cm])
             table.setStyle(TableStyle([('INNERGRID',(0,0),(-1,-1),0.25,colors.black),('BOX',(0,0),(-1,-1),0.25,colors.black)]))
             #Pdf size
             table.wrapOn(c, width, height)
