@@ -1,20 +1,38 @@
 from django.shortcuts import render
 from rest_framework import viewsets, generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .backends import *
+from rest_framework.exceptions import APIException
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_202_ACCEPTED
+)
 
+from .backends import *
 from .models import *
 from .serializers import *
-
-from d_accounts_app.models import User
 from .email import *
 
-from rest_framework.views import APIView
+from a_students_app.models import Program
+from a_students_app.models import Student, Enrrollment
+from c_tracking_app.models import TestDirector, TestCoordinator
+from d_information_management_app.models import Institution, InvestigationLine, Professor, City, Country, ManageInvestLine
+from d_accounts_app.models import User
+
+import json
+
+from django.http import HttpResponse
 from django.http.response import HttpResponse
+from django.views.generic.base import TemplateView
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Avg, Sum, Count
 
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
-
 
 from io import BytesIO
 from reportlab.pdfgen import canvas
@@ -24,24 +42,38 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus.paragraph import Paragraph
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
-from a_students_app.models import Student,Enrrollment
+
+from django.db.models.signals import post_save, pre_save
+from .signal import *
+
+post_save.connect(save_or_send_activity, sender=Lecture)
+post_save.connect(save_or_send_activity, sender=Publication)
+post_save.connect(save_or_send_activity, sender=ProjectCourse)
+post_save.connect(save_or_send_activity, sender=ResearchStays)
+post_save.connect(save_or_send_activity, sender=PresentationResults)
+post_save.connect(save_or_send_activity, sender=ParticipationProjects)
 
 
 
+pre_save.connect(save_or_send_activity1, sender=Lecture)
+pre_save.connect(save_or_send_activity1, sender=Publication)
+pre_save.connect(save_or_send_activity1, sender=ProjectCourse)
+pre_save.connect(save_or_send_activity1, sender=ResearchStays)
+pre_save.connect(save_or_send_activity1, sender=PresentationResults)
+pre_save.connect(save_or_send_activity1, sender=ParticipationProjects)
 
-class ReportTest(APIView):
+class ReportTest(TemplateView):
     def get(self, request, *args, **kwargs):
         
         queryProfessors = Professor.objects.all()
         queryStudentsProfessor = StudentProfessor.objects.all()
-
     
         wb = Workbook()
         controller = 6
         ws = wb.active
-        ws.title = '4.a.'
-#region Encabezados
+        ws.title = '7.a.c.'
 
+#region Encabezados
         #Create title in the sheet
         ws['A1'].alignment = Alignment(horizontal="center",vertical="center")
         ws['A1'].border = Border(left = Side(border_style = "thin"), right=Side(border_style = "thin"),
@@ -49,14 +81,12 @@ class ReportTest(APIView):
         ws['A1'].font = Font(name = 'Arial',size =8, bold =True)
         ws.column_dimensions['A'].width = 12
         ws['A1'] = "CARACTERÍSTICA"
-        
 
         ws['B1'].alignment = Alignment(horizontal="left",vertical="center")
         ws['B1'].border = Border(left = Side(border_style = "thin"), right=Side(border_style = "thin"),
         top=Side(border_style="thin"),bottom=Side(border_style ="thin"))
         ws['B1'].font = Font(name = 'Arial',size =8, bold =True)
         ws['B1'] = "7. Relación estudiante / tutor."
-
 
         ws['A2'].alignment = Alignment(horizontal="right",vertical="center")
         ws['A2'].border = Border(left = Side(border_style = "thin"), right=Side(border_style = "thin"),
@@ -76,9 +106,6 @@ class ReportTest(APIView):
         ws['B3'].font = Font(name = 'Arial',size =8)
         ws['B3'] = "a. Número de estudiantes por tutor (sólo profesores de TC y habilitados para dirigir tesis)."
 
-
-
-
         #Change the characteristics of cells
         ws.merge_cells('B1:F1')
         ws.merge_cells('B2:F2')
@@ -97,9 +124,7 @@ class ReportTest(APIView):
         ws.column_dimensions['K'].width = 6
         ws.column_dimensions['K'].width = 6
 
-
         #Create header
-
         ws['B5'].alignment = Alignment(horizontal="center",vertical="center")
         ws['B5'].border = Border(left = Side(border_style = "thin"), right=Side(border_style = "thin"),
         top=Side(border_style="thin"),bottom=Side(border_style ="thin"))
@@ -149,8 +174,6 @@ class ReportTest(APIView):
         ws['H5'].font = Font(name = 'Arial',size =8, bold =True)
         ws['H5']='Modalidad Dirección'
 
-
-
         ws['J5'].alignment = Alignment(horizontal="left",vertical="center")
         ws['J5'].border = Border(left = Side(border_style = "thin"), right=Side(border_style = "thin"),
                                             top=Side(border_style="thin"),bottom=Side(border_style ="thin"))
@@ -162,7 +185,6 @@ class ReportTest(APIView):
                                             top=Side(border_style="thin"),bottom=Side(border_style ="thin"))
         ws['K5'].fill = PatternFill(start_color = '78F293',end_color ='78F293', fill_type='solid')
         ws['K5'].font = Font(name = 'Arial',size =8, bold =True)
-
 
         ws['J6'].alignment = Alignment(horizontal="left",vertical="center")
         ws['J6'].border = Border(left = Side(border_style = "thin"), right=Side(border_style = "thin"),
@@ -176,7 +198,6 @@ class ReportTest(APIView):
         ws['K6'].fill = PatternFill(start_color = '78F293',end_color ='78F293', fill_type='solid')
         ws['K6'].font = Font(name = 'Arial',size =8, bold =True, color='FFFF0000')
         
-
         ws['J7'].alignment = Alignment(horizontal="left",vertical="center")
         ws['J7'].border = Border(left = Side(border_style = "thin"), right=Side(border_style = "thin"),
                                             top=Side(border_style="thin"),bottom=Side(border_style ="thin"))
@@ -198,8 +219,6 @@ class ReportTest(APIView):
         ws['L7']=str('0%')
 #endregion
 
-        """ ws.merge_cells('B6:B7')
-        ws.merge_cells('B8:B9') """
         countHabDirigir = 0
         countTutorias = 0
         countPrincipales = 0
@@ -209,7 +228,6 @@ class ReportTest(APIView):
 
             for q2 in queryStudentsProfessor:
                 
-                
                 if (q.user.id == q2.professor.user.id ):
                     ws.cell(row=controller,column=5).alignment = Alignment(horizontal="center")
                     ws.cell(row=controller,column=5).border = Border(left = Side(border_style = "thin"), right=Side(border_style = "thin"),
@@ -217,7 +235,6 @@ class ReportTest(APIView):
                     ws.cell(row =controller, column=5).font = Font(name='Arial',size=8)
                     ws.cell(row =controller, column=5).value = q2.student.user.first_name +" "+ q2.student.user.last_name
                     countEst +=1
-
 
                     ws.cell(row=controller,column=6).alignment = Alignment(horizontal="center")
                     ws.cell(row=controller,column=6).border = Border(left = Side(border_style = "thin"), right=Side(border_style = "thin"),
@@ -233,8 +250,6 @@ class ReportTest(APIView):
                         for q3 in queryStudentsProfessor:
                             if(q2.student.user.id == q3.student.user.id and q3.rol ==2):
                                 varRol = q3.professor.user.first_name +" "+ q3.professor.user.last_name
-                        
-
 
                     ws.cell(row=controller,column=7).alignment = Alignment(horizontal="center")
                     ws.cell(row=controller,column=7).border = Border(left = Side(border_style = "thin"), right=Side(border_style = "thin"),
@@ -242,20 +257,14 @@ class ReportTest(APIView):
                     ws.cell(row =controller, column=7).font = Font(name='Arial',size=8)
                     ws.cell(row =controller, column=7).value = varRol
 
-
                     ws.cell(row=controller,column=8).alignment = Alignment(horizontal="center")
                     ws.cell(row=controller,column=8).border = Border(left = Side(border_style = "thin"), right=Side(border_style = "thin"),
                                                                     top=Side(border_style="thin"),bottom=Side(border_style ="thin"))
                     ws.cell(row =controller, column=8).font = Font(name='Arial',size=8)
                     ws.cell(row =controller, column=8).value = varModalidad
 
-
-
                     controller +=1
 
-
-
-            
             ws.merge_cells('B'+str(defController) +':B'+str(controller-1))
             ws.merge_cells('C'+str(defController) +':C'+str(controller-1))
             ws.merge_cells('D'+str(defController) +':D'+str(controller-1))
@@ -274,7 +283,6 @@ class ReportTest(APIView):
             ws.cell(row =defController, column=3).value = str(isDirector)
             countHabDirigir += isDirector
 
-
             ws.cell(row=defController,column=4).alignment = Alignment(horizontal="center")
             ws.cell(row=defController,column=4).border = Border(left = Side(border_style = "thin"), right=Side(border_style = "thin"), top=Side(border_style="thin"),bottom=Side(border_style ="thin"))
             ws.cell(row =defController, column=4).font = Font(name='Arial',size=8)
@@ -290,7 +298,7 @@ class ReportTest(APIView):
         ws.cell(row =controller, column=4).value = str(countTutorias)
 
         varEstXTutor = 0
-        if(countTutorias != 0):
+        if(countHabDirigir != 0):
             varEstXTutor = countTutorias/countHabDirigir
         ws['K5']=str(varEstXTutor)
         ws['K6']=str(countPrincipales)
@@ -302,10 +310,9 @@ class ReportTest(APIView):
         response["Content-Disposition"] = content
         wb.save(response)
 
-        
-        return response        
+        return response
 
-
+# Modulo B #
 def SendEmailNotification(request):
     queryUser = User.objects.get(student=request.data.get('student'))
     queryset = StudentProfessor.objects.filter(student=request.data.get('student')).values('professor')
@@ -315,7 +322,6 @@ def SendEmailNotification(request):
         
         send_email(queryUser, professor)  
 
-# Modulo B #
 class ActivityViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticated, (IsStudent | IsDirector | IsCoordinador)]
     queryset = Activity.objects.all()
@@ -404,9 +410,6 @@ class PrizeViewSet(viewsets.ModelViewSet):
     serializer_class = PrizeSerializer
 
 # Consultas a otros modulos #
-from a_students_app.models import Program
-from d_information_management_app.models import Institution, InvestigationLine, Professor, City, Country, ManageInvestLine
-
 class ProgramViewSet(viewsets.ModelViewSet):
     queryset = Program.objects.all()
     serializer_class = ProgramSerializer
@@ -428,22 +431,6 @@ class CountryViewSet(viewsets.ModelViewSet):
     serializer_class = CountrySerializer
 
 # Otro tipo de Consultas #
-from a_students_app.models import Enrrollment
-from c_tracking_app.models import TestDirector, TestCoordinator
-from rest_framework.response import Response
-
-from rest_framework.status import (
-    HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
-    HTTP_200_OK,
-    HTTP_201_CREATED,
-    HTTP_202_ACCEPTED
-)
-from django.http import HttpResponse
-import json
-from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Avg, Sum, Count
-
 class TestDirectorAPI(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
