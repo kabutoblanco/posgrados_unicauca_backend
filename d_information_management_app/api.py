@@ -321,7 +321,25 @@ class CreateProfessorAPI(generics.GenericAPIView):# toca modificarlo a los cambi
         assignedUser.is_proffessor = True
         assignedUser.save()
         if serializer.is_valid():
-            professor = serializer.save()              
+            serializer.save()
+            aux = Professor.objects.get(user=request.data['user'])
+            if request.data['is_internal'] == True:
+                working = WorksDepartm(
+                    professor=request.data[aux.pk],
+                    department=request.data['department'],
+                    laboral_category="No se que poner",
+                    laboral_state=True
+                )
+                working.save()
+            else:
+                working = WorksDepartm(
+                    professor=request.data[aux.pk],
+                    department=request.data['department'],
+                    laboral_category="Tampoco se que poner",
+                    laboral_state=True
+                )
+                working.save()
+            print("--------------------------------- ", )
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
@@ -399,7 +417,7 @@ class ConsultCountry_idAPI(APIView):
 
     def put(self, request, *args, **kwargs):
         try:
-            model = Country.objects.get(id=request.data['id'], status=True)
+            model = Country.objects.get(id=request.data['id'])
         except Country.DoesNotExist:
             return Response(f"No existe el País en la base de datos", status=status.HTTP_404_NOT_FOUND)
 
