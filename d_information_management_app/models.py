@@ -373,7 +373,7 @@ class IsMember(models.Model):
         Referencia a un profesor
     inv_group : int
         Referencia a un grupo de investigacion
-    membershio_status : boolean
+    member_status : boolean
         Estado de la relacion en la cual el profesor es miembro o no de un grupo de investigacion
     """
     professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
@@ -408,7 +408,8 @@ class WorksDepartm(models.Model):
     """
     professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=False, null=True)
-    laboral_category = models.CharField(max_length=50, blank=False, null=False)
+    laboral_category = models.CharField(max_length=20, blank=False, null=False)
+    time_category = models.CharField(max_length=20, blank=False, null=False)
     laboral_state = models.BooleanField(default=True, blank=False, null=False)
 
     class Meta:

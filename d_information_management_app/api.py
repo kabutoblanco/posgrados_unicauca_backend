@@ -326,24 +326,6 @@ class CreateProfessorAPI(generics.GenericAPIView):# toca modificarlo a los cambi
         assignedUser.save()
         if serializer.is_valid():
             serializer.save()
-            aux = Professor.objects.get(user=request.data['user'])
-            if request.data['is_internal'] == True:
-                working = WorksDepartm(
-                    professor=request.data[aux.pk],
-                    department=request.data['department'],
-                    laboral_category="No se que poner",
-                    laboral_state=True
-                )
-                working.save()
-            else:
-                working = WorksDepartm(
-                    professor=request.data[aux.pk],
-                    department=request.data['department'],
-                    laboral_category="Tampoco se que poner",
-                    laboral_state=True
-                )
-                working.save()
-            print("--------------------------------- ", )
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
@@ -946,6 +928,45 @@ class ConsultProfessor_idAPI(APIView):
 
         serializer = ProfessorSerializer(model, data=request.data)
         if serializer.is_valid():
+            if 'status' in request.data.keys():
+                if request.data['status'] == False:
+                    isMemberProf = IsMember.objects.filter(professor=kwargs['id'])
+                    for ref in isMemberProf:
+                        aux = IsMember.objects.get(professor=ref.professor, inv_group=ref.inv_group)
+                        aux.member_status = False
+                        aux.save()
+                    manageIL = ManageInvestLine.objects.filter(professor=kwargs['id'])
+                    if manageIL:
+                        for ref in manageIL:
+                            aux = ManageInvestLine.objects.get(professor=ref.professor, inv_line=ref.inv_line)
+                            aux.analysis_state = False
+                            aux.save()
+                    manageIG = ManageInvestGroup.objects.filter(professor=kwargs['id'])
+                    if manageIG:
+                        for ref in manageIG:
+                            aux = ManageInvestGroup.objects.get(professor=ref.professor, inv_group=ref.inv_group)
+                            aux.direction_state = False
+                            aux.save()
+
+
+                if request.data['status'] == True:
+                    isMemberProf = IsMember.objects.filter(professor=kwargs['id'])
+                    for ref in isMemberProf:
+                        aux = IsMember.objects.get(professor=ref.professor, inv_group=ref.inv_group)
+                        aux.member_status = True
+                        aux.save()
+                    manageIL = ManageInvestLine.objects.filter(professor=kwargs['id'])
+                    if manageIL:
+                        for ref in manageIL:
+                            aux = ManageInvestLine.objects.get(professor=ref.professor, inv_line=ref.inv_line)
+                            aux.analysis_state = True
+                            aux.save()
+                    manageIG = ManageInvestGroup.objects.filter(professor=kwargs['id'])
+                    if manageIG:
+                        for ref in manageIG:
+                            aux = ManageInvestGroup.objects.get(professor=ref.professor, inv_group=ref.inv_group)
+                            aux.direction_state = True
+                            aux.save()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
