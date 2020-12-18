@@ -374,7 +374,7 @@ class ConsultCountryAPI(APIView):
     """
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     API que permite:
-    ☠ Consultar Paises, esta función hace uso del metodo GET.
+    ☠ Consultar Paises, esta función hace uso del metodo GET. 
     PATH: 'api/1.0/consultar_pais/'
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     """
@@ -383,11 +383,24 @@ class ConsultCountryAPI(APIView):
         queryset = Country.objects.filter(status=True)
         return Response({"Countrys": CountrySerializer(queryset, many=True).data })
 
+class FullConsultCountryAPI(APIView):
+    """
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    API que permite:
+    ☠ Consultar Paises (sin filtrar por status), esta función hace uso del metodo GET. 
+    PATH: 'api/1.0/consultar_pais/'
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    """
+    #permission_classes = [IsAuthenticated, IsCoordinator]
+    def get(self, request, *args, **kwargs):
+        queryset = Country.objects.all()
+        return Response({"Countrys": CountrySerializer(queryset, many=True).data })
+
 class ConsultCountry_idAPI(APIView):
     """
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     API que permite:
-    ☠ Consultar País enviando su id, esta función hace uso del metodo GET.
+    ☠ Consultar País enviando su id, esta función hace uso del metodo GET. 
     ☠ Actualizar un País enviando un JSON, esta función hace uso del método PUT.
     PATH: 'api/1.0/consultar_pais_id/<int:id_country>'
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
@@ -409,6 +422,39 @@ class ConsultCountry_idAPI(APIView):
 
         serializer = CountrySerializer(model, data=request.data)
         if serializer.is_valid():
+            if 'status' in request.data.keys():
+                if request.data['status'] == False:
+                    states = State.objects.filter(country=model) 
+                    for regS in states: 
+                        tmpState =  State.objects.get(id=regS.id)
+                        tmpState.status = False
+                        tmpState.save()
+                        cities = City.objects.filter(state = tmpState)
+                        for regC in cities:
+                            tmpCity = City.objects.get(id=regC.id)
+                            tmpCity.status = False
+                            tmpCity.save()
+                            institutions = Institution.objects.filter(city=tmpCity)
+                            for regI in institutions:
+                                tmpInstitution = Institution.objects.get(id=regI.id)
+                                tmpInstitution.status = False
+                                tmpInstitution.save()
+                if request.data['status'] == True:   
+                    states = State.objects.filter(country=model) 
+                    for regS in states: 
+                        tmpState =  State.objects.get(id=regS.id)
+                        tmpState.status = True
+                        tmpState.save()
+                        cities = City.objects.filter(state = tmpState)
+                        for regC in cities:
+                            tmpCity = City.objects.get(id=regC.id)
+                            tmpCity.status = True
+                            tmpCity.save()
+                            institutions = Institution.objects.filter(city=tmpCity)
+                            for regI in institutions:
+                                tmpInstitution = Institution.objects.get(id=regI.id)
+                                tmpInstitution.status = True
+                                tmpInstitution.save()       
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
@@ -440,9 +486,54 @@ class ConsultState_CountryAPI(APIView):
         print(request.data)
         serializer = StateSerializer(model, data=request.data)
         if serializer.is_valid():
+            if 'status' in request.data.keys():
+                if request.data['status'] == False:
+                    cities = City.objects.filter(state = model)
+                    for regC in cities:
+                        tmpCity = City.objects.get(id=regC.id)
+                        tmpCity.status = False
+                        tmpCity.save()
+                        institutions = Institution.objects.filter(city=tmpCity)
+                        for regI in institutions:
+                            tmpInstitution = Institution.objects.get(id=regI.id)
+                            tmpInstitution.status = False
+                            tmpInstitution.save()
+                if request.data['status'] == True:
+                    cities = City.objects.filter(state = model)
+                    for regC in cities:
+                        tmpCity = City.objects.get(id=regC.id)
+                        tmpCity.status = True
+                        tmpCity.save()
+                        institutions = Institution.objects.filter(city=tmpCity)
+                        for regI in institutions:
+                            tmpInstitution = Institution.objects.get(id=regI.id)
+                            tmpInstitution.status = True
+                            tmpInstitution.save()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+class FullConsultState_CountryAPI(APIView):
+    """
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒►Departamento en contexto de País
+    API que permite:
+    ☠ Consultar Departamentos (sin filtrar por status) de un determinado País enviando su id, esta función hace uso del metodo GET.
+    PATH: 'api/1.0/consultar_departamento_pais/<int:id_country>'
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    """
+    #permission_classes = [IsAuthenticated, IsCoordinator]
+    def get(self, request, *args, **kwargs):
+        try:
+            country = Country.objects.get(id=kwargs["id_country"])
+        except Country.DoesNotExist:
+            return Response(f"No existe País en la base de datos", status=status.HTTP_404_NOT_FOUND)
+
+        queryset = State.objects.filter(country=country)
+        returned = StateSerializer(queryset, many=True).data
+        if returned:
+            return Response({"States": returned}, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(f"No existen Departamentos con ese País en la base de datos", status=status.HTTP_404_NOT_FOUND)
 
 class ConsultCity_StateAPI(APIView):
     """
@@ -470,9 +561,45 @@ class ConsultCity_StateAPI(APIView):
         
         serializer = CitySerializer(model, data=request.data)
         if serializer.is_valid():
+            if 'status' in request.data.keys():
+                if request.data['status'] == False:
+                    institutions = Institution.objects.filter(city=model)
+                    for regI in institutions:
+                        tmpInstitution = Institution.objects.get(id=regI.id)
+                        tmpInstitution.status = False
+                        tmpInstitution.save()
+                if request.data['status'] == True:
+                    institutions = Institution.objects.filter(city=model)
+                    for regI in institutions:
+                        tmpInstitution = Institution.objects.get(id=regI.id)
+                        tmpInstitution.status = True
+                        tmpInstitution.save()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class FullConsultCity_StateAPI(APIView):
+    """
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    API que permite:
+    ☠ Consultar Ciudades (sin filtrar por status) de un determinado Departamento enviando su id, esta función hace uso del metodo GET.
+    PATH: 'api/1.0/consultar_ciudad_departamento/<int:id_dep>'
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    """
+    #permission_classes = [IsAuthenticated, IsCoordinator]
+    def get(self, request, *args, **kwargs):
+        try:
+            state = State.objects.get(id=kwargs["id_dep"])
+        except State.DoesNotExist:
+            return Response(f"No existe Departamento en la base de datos", status=status.HTTP_404_NOT_FOUND)
+
+        queryset = City.objects.filter(state=state)
+        returned = CitySerializer(queryset, many=True).data
+        if returned:
+            return Response({"Cities": returned}, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(f"No existen Ciudades con ese Departamento en la base de datos", status=status.HTTP_404_NOT_FOUND)
+
 
 class ConsultInstitutionAPI(APIView):
     """
@@ -484,6 +611,18 @@ class ConsultInstitutionAPI(APIView):
     """
     def get(self, request, *args, **kwargs):
         queryset = Institution.objects.filter(status=True, city__state__country__status=True)
+        return Response({"Institutions": InstitutionSerializer(queryset, many=True).data })
+
+class FullConsultInstitutionAPI(APIView):
+    """
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    API que permite:
+    ☠ Consultar Instituciones (sin filtrar por status), esta función hace uso del metodo GET.
+    PATH: 'api/1.0/consultar_institucion/'
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    """
+    def get(self, request, *args, **kwargs):
+        queryset = Institution.objects.all()
         return Response({"Institutions": InstitutionSerializer(queryset, many=True).data })
 
 class ConsultInstitution_idAPI(APIView):
