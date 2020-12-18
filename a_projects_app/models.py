@@ -4,10 +4,9 @@ from d_information_management_app.models import InvestigationLine, Professor
 
 class Project(models.Model):
     
-    provisional_title = models.CharField(max_length=40, blank=False, null=False)
-    objetive_topic = models.CharField(max_length=80, blank=False, null=False)
-    objetive_generl = models.CharField(max_length=900, blank=False, null=False)
-    objetive_specific = models.CharField(max_length=900, blank=False, null=False)
+    provisional_title = models.CharField(max_length=256, blank=False, null=False)
+    objetive_topic = models.CharField(max_length=256, blank=False, null=False)
+    
     
 
     investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True)
@@ -16,7 +15,7 @@ class Project(models.Model):
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
-
+    #todos los campos relacionados con proyecto en un json y al final los campos general capturar el json de crear proyecto sacar el json ponerlo en el json de los objetivos genereal y luego especifico.
     class Meta:
         verbose_name='Proyecto'
         verbose_name_plural='Proyectos'
