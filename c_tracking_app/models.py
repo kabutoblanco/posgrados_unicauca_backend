@@ -3,8 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 
 from d_information_management_app.models import Professor, CoordinatorProgram
-from b_activities_app.models import Activity
-from a_students_app.models import Student, Enrrollment
+from b_activities_app.models import *
+from a_students_app.models import Student, Enrrollment, StudentProfessor
 from .email import send_email, send_email1
 
 
@@ -183,6 +183,8 @@ def create_customer(sender, instance, created, **kwargs):
             queryset = Enrrollment.objects.filter(
                 student__user=instance.student.user).order_by('-period')[:1]
             queryset = queryset[0]
+            if instance.status == 1 and instance.enrrollment_date is not None:
+                queryset.enrrollment_date = instance.enrrollment_date    
             queryset.state = instance.status
             queryset.save()
         except:
@@ -239,9 +241,18 @@ def save_or_send_testdirector(sender, instance, created, **kwargs):
         queryset = CoordinatorProgram.objects.filter(
             program=instance.activity.student.program).order_by('-academic_period')[:1]
         queryset = Professor.objects.get(id=queryset[0].professor.id)
+
+        queryset1 = Activity.objects.get(pk=instance.activity.id)
+        queryset1.state = 3
+        queryset1.save()
+
         professor_activity = ActivityProfessor(activity=instance.activity, professor=queryset, rol=3)
         professor_activity.save()
         send_email(queryset, instance)
+    else:
+        queryset1 = Activity.objects.get(pk=instance.activity.id)
+        queryset1.state = 2
+        queryset1.save()
     # except:
     #     print('error')
 
@@ -255,9 +266,35 @@ def save_or_send_testcoordinator(sender, instance, created, **kwargs):
         # envia email
         queryset = Professor.objects.get(pk=instance.coordinator.id)
         student = Student.objects.get(pk=instance.activity.student.id)
+        queryset1 = Activity.objects.get(pk=instance.activity.id)
+        queryset1.state = 4
+        queryset1.save()
         send_email1(queryset, student, instance)
     # except:
     #     pass
 
 
 post_save.connect(save_or_send_testcoordinator, sender=TestCoordinator)
+
+def save_or_send_activity(sender, instance, created, **kwargs):
+    # try:
+    print('22das')
+    if created:
+        # envia email
+        print('22das')
+        query = StudentProfessor.objects.filter(student=instance.student.id, rol=1).order_by('-id')[:1][0]
+        print(instance)
+        query = ActivityProfessor(rol=1, activity=instance, professor=query.professor)
+        query.save()
+    # except:
+    #     pass
+
+
+# post_save.connect(save_or_send_activity, sender=Activity)
+post_save.connect(save_or_send_activity, sender=Lecture)
+post_save.connect(save_or_send_activity, sender=Publication)
+post_save.connect(save_or_send_activity, sender=ProjectCourse)
+post_save.connect(save_or_send_activity, sender=ResearchStays)
+post_save.connect(save_or_send_activity, sender=PresentationResults)
+post_save.connect(save_or_send_activity, sender=ParticipationProjects)
+post_save.connect(save_or_send_activity, sender=Prize)

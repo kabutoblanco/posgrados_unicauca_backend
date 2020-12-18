@@ -21,7 +21,8 @@ from .api import (CreateCountryAPI, CreateStateAPI, CreateCityAPI, CreateInstitu
                  ConsultWorksInvestGroup_GIAPI,ReportTest, ConsultWorksDepartmAPI, ConsultWorksDepartm_profAPI,
                  ConsultWorksDepartm_depAPI, ConsultManageInvestLineAPI, ConsultManageInvestLine_invLineAPI, 
                  ConsultManageInvestLine_profAPI, ConsultProfessor_userAPI, CreateCoordinatorProgramAPI,
-                 ConsultCoordinatorAPI)
+                 ConsultCoordinatorAPI,FullConsultCountryAPI,FullConsultState_CountryAPI,FullConsultCity_StateAPI,
+                 FullConsultInstitutionAPI, CreateWorkDepartmentAPI)
 
 urlpatterns = [
     #Javier
@@ -37,10 +38,14 @@ urlpatterns = [
     path('api/1.0/crear_formacion_academica/', CreateAcademicTrainingAPI.as_view()),
     #Consultar
     path('api/1.0/consultar_pais/', ConsultCountryAPI.as_view()),
+    path('api/1.0/full_consultar_pais/', FullConsultCountryAPI.as_view()),
     path('api/1.0/consultar_pais_id/<int:id_country>', ConsultCountry_idAPI.as_view()),
     path('api/1.0/consultar_departamento_pais/<int:id_country>', ConsultState_CountryAPI.as_view()),
+    path('api/1.0/full_consultar_departamento_pais/<int:id_country>', FullConsultState_CountryAPI.as_view()),
     path('api/1.0/consultar_ciudad_departamento/<int:id_dep>', ConsultCity_StateAPI.as_view()),
+    path('api/1.0/full_consultar_ciudad_departamento/<int:id_dep>', FullConsultCity_StateAPI.as_view()),
     path('api/1.0/consultar_institucion/', ConsultInstitutionAPI.as_view()),
+    path('api/1.0/full_consultar_institucion/', FullConsultInstitutionAPI.as_view()),
     path('api/1.0/consultar_institucion_id/<int:id>', ConsultInstitution_idAPI.as_view()),
     path('api/1.0/consultar_facultad/', ConsultFacultyAPI.as_view()),
     path('api/1.0/consultar_facultad_id/<int:id>', ConsultFaculty_idAPI.as_view()),
@@ -55,6 +60,7 @@ urlpatterns = [
     path('api/1.0/crear_dirige/', CreateManageInvestGroupAPI.as_view()),
     path('api/1.0/crear_maneja/', CreateManageInvestLineAPI.as_view()), # falta editar
     path('api/1.0/create_is_member/', CreateIsMemberAPI.as_view()),
+    path('api/1.0/crear_labora/', CreateWorkDepartmentAPI.as_view()),
     path('api/1.0/crear_coordinador/', CreateCoordinatorProgramAPI.as_view()),
     # falta todo lo relacionado con labora, desde crear hasta editar
     #Consultar

@@ -73,29 +73,42 @@ class ConsultUser_idAPI(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
-   
 #endregion
 
 #region autenticacion usuarios
 class AuthUserAPI(APIView):
     def get(self, request, *args, **kwargs):
+        typeList = ["Usuario sin rol"]
+        try:
+            CoordinatorProgram.objects.get(professor__user=kwargs['id'], professor__status=True)
+            typeList.append("coordinador")
+            if "Usuario sin rol" in typeList:
+	            typeList.remove("Usuario sin rol")
+        except CoordinatorProgram.DoesNotExist:
+            print("No es coordinador")
+        try:
+            ManageInvestGroup.objects.get(professor__user=kwargs['id'], professor__status=True)
+            if "Usuario sin rol" in typeList:
+	            typeList.remove("Usuario sin rol")
+            typeList.append("director")
+        except ManageInvestGroup.DoesNotExist:
+            print("No es director")
         try:
             Professor.objects.get(user=kwargs['id'], status=True)
-            return Response(f"profesor")
+            if "Usuario sin rol" in typeList:
+	            typeList.remove("Usuario sin rol")
+            typeList.append("profesor")
         except Professor.DoesNotExist:
-            try:
-                ManageInvestGroup.objects.get(professor__user=kwargs['id'], professor__status=True)
-                return Response(f"director")
-            except ManageInvestGroup.DoesNotExist:
-                try:
-                    CoordinatorProgram.objects.get(professor__user=kwargs['id'], professor__status=True)
-                    return Response(f"coordinador")
-                except CoordinatorProgram.DoesNotExist:
-                    try:
-                        Student.objects.get(user=kwargs['id'], is_active=True)
-                        return Response(f"estudiante")
-                    except Student.DoesNotExist:
-                        return Response(f"Usuario sin rol")
+            print("No es profesor")
+        try:
+            Student.objects.get(user=kwargs['id'], is_active=True)
+            if "Usuario sin rol" in typeList:
+	            typeList.remove("Usuario sin rol")
+            typeList.append("estudiante")
+        except Student.DoesNotExist:
+            return Response(typeList)
+        return Response(typeList)
+        
 
 
 #endregion
