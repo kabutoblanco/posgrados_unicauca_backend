@@ -22,7 +22,7 @@ from .api import (CreateCountryAPI, CreateStateAPI, CreateCityAPI, CreateInstitu
                  ConsultWorksDepartm_depAPI, ConsultManageInvestLineAPI, ConsultManageInvestLine_invLineAPI, 
                  ConsultManageInvestLine_profAPI, ConsultProfessor_userAPI, CreateCoordinatorProgramAPI,
                  ConsultCoordinatorAPI,FullConsultCountryAPI,FullConsultState_CountryAPI,FullConsultCity_StateAPI,
-                 FullConsultInstitutionAPI)
+                 FullConsultInstitutionAPI, CreateWorkDepartmentAPI)
 
 urlpatterns = [
     #Javier
@@ -60,6 +60,7 @@ urlpatterns = [
     path('api/1.0/crear_dirige/', CreateManageInvestGroupAPI.as_view()),
     path('api/1.0/crear_maneja/', CreateManageInvestLineAPI.as_view()), # falta editar
     path('api/1.0/create_is_member/', CreateIsMemberAPI.as_view()),
+    path('api/1.0/crear_labora/', CreateWorkDepartmentAPI.as_view()),
     path('api/1.0/crear_coordinador/', CreateCoordinatorProgramAPI.as_view()),
     # falta todo lo relacionado con labora, desde crear hasta editar
     #Consultar

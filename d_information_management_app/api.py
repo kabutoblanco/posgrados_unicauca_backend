@@ -1051,7 +1051,7 @@ class ConsultProfessor_idAPI(APIView):
     """
     #permission_classes = [IsAuthenticated, IsCoordinator]
     def get(self, request, *args, **kwargs):
-        queryset = Professor.objects.filter(id=kwargs['id'], status=True)
+        queryset = Professor.objects.filter(id=kwargs['id'])
 
         returned = ProfessorSerializer(queryset, many=True).data
         if returned:
@@ -1061,7 +1061,7 @@ class ConsultProfessor_idAPI(APIView):
 
     def put(self, request, *args, **kwargs):
         try:
-            model = Professor.objects.get(id=kwargs['id'], status=True)
+            model = Professor.objects.get(id=kwargs['id'])
         except Professor.DoesNotExist:
             return Response(f"No existe el Profesor en la base de datos", status=status.HTTP_404_NOT_FOUND)
 
@@ -1075,17 +1075,15 @@ class ConsultProfessor_idAPI(APIView):
                         aux.member_status = False
                         aux.save()
                     manageIL = ManageInvestLine.objects.filter(professor=kwargs['id'])
-                    if manageIL:
-                        for ref in manageIL:
-                            aux = ManageInvestLine.objects.get(professor=ref.professor, inv_line=ref.inv_line)
-                            aux.analysis_state = False
-                            aux.save()
+                    for ref in manageIL:
+                        aux = ManageInvestLine.objects.get(professor=ref.professor, inv_line=ref.inv_line)
+                        aux.analysis_state = False
+                        aux.save()
                     manageIG = ManageInvestGroup.objects.filter(professor=kwargs['id'])
-                    if manageIG:
-                        for ref in manageIG:
-                            aux = ManageInvestGroup.objects.get(professor=ref.professor, inv_group=ref.inv_group)
-                            aux.direction_state = False
-                            aux.save()
+                    for ref in manageIG:
+                        aux = ManageInvestGroup.objects.get(professor=ref.professor, inv_group=ref.inv_group)
+                        aux.direction_state = False
+                        aux.save()
 
 
                 if request.data['status'] == True:
@@ -1095,17 +1093,15 @@ class ConsultProfessor_idAPI(APIView):
                         aux.member_status = True
                         aux.save()
                     manageIL = ManageInvestLine.objects.filter(professor=kwargs['id'])
-                    if manageIL:
-                        for ref in manageIL:
-                            aux = ManageInvestLine.objects.get(professor=ref.professor, inv_line=ref.inv_line)
-                            aux.analysis_state = True
-                            aux.save()
+                    for ref in manageIL:
+                        aux = ManageInvestLine.objects.get(professor=ref.professor, inv_line=ref.inv_line)
+                        aux.analysis_state = True
+                        aux.save()
                     manageIG = ManageInvestGroup.objects.filter(professor=kwargs['id'])
-                    if manageIG:
-                        for ref in manageIG:
-                            aux = ManageInvestGroup.objects.get(professor=ref.professor, inv_group=ref.inv_group)
-                            aux.direction_state = True
-                            aux.save()
+                    for ref in manageIG:
+                        aux = ManageInvestGroup.objects.get(professor=ref.professor, inv_group=ref.inv_group)
+                        aux.direction_state = True
+                        aux.save()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
