@@ -479,7 +479,7 @@ class ConsultState_CountryAPI(APIView):
 
     def put(self, request, *args, **kwargs):
         try:
-            model = State.objects.get(id=request.data['id'], status=True)
+            model = State.objects.get(id=request.data['id'])
         except State.DoesNotExist:
             return Response(f"No existe ese Departamento en la base de datos", status=status.HTTP_404_NOT_FOUND)
         
@@ -555,7 +555,7 @@ class ConsultCity_StateAPI(APIView):
 
     def put(self, request, *args, **kwargs):
         try:
-            model = City.objects.get(id=request.data['id'], status=True)
+            model = City.objects.get(id=request.data['id'])
         except City.DoesNotExist:
             return Response(f"No existe esa Ciudad en la base de datos", status=status.HTTP_404_NOT_FOUND)
         
