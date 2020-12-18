@@ -986,11 +986,19 @@ class ConsultInvestigationGroup_idAPI(APIView):
         if serializer.is_valid():
             if 'status' in request.data.keys():
                 if request.data['status'] == False:
-                    manageInvLine = ManageInvestGroup.objects.get(inv_group=kwargs['id'], direction_state=True)
-                    manageInvLine.direction_state = False
+                    worksInvGroups = WorksInvestGroup.objects.filter(inv_group=kwargs['id'])
+                    for ref in worksInvGroups:
+                        aux = WorksInvestGroup.objects.get(inv_group=ref.inv_group, know_area=ref.know_area)
+                        aux.study_status = False
+                        aux.save()
+                    try:
+                        manageInvLine = ManageInvestGroup.objects.get(inv_group=kwargs['id'], direction_state=True)
+                        manageInvLine.direction_state = False
+                        manageInvLine.save()
+                    except ManageInvestGroup.DoesNotExist:
+                        print("")
                     oldProfessor = Professor.objects.get(id=manageInvLine.professor.pk, status=True)
                     oldProfessor.is_director_gi = False
-                    manageInvLine.save()
                     oldProfessor.save()  
                     isMember = IsMember.objects.filter(inv_group=kwargs['id']) 
                     for reg in isMember: 
@@ -1006,11 +1014,21 @@ class ConsultInvestigationGroup_idAPI(APIView):
                                          
                     
                 if request.data['status'] == True:
-                    manageInvLine = ManageInvestGroup.objects.get(inv_group=kwargs['id'])
-                    manageInvLine.direction_state = True
+                    worksInvGroups = WorksInvestGroup.objects.filter(inv_group=kwargs['id'])
+                    for ref in worksInvGroups:
+                        refKnowArea = KnowledgeArea.objects.filter(id=ref.know_area, status=True)
+                        if refKnowArea:
+                            aux = WorksInvestGroup.objects.get(inv_group=ref.inv_group, know_area=ref.know_area)
+                            aux.study_status = True
+                            aux.save()
+                    try:
+                        manageInvLine = ManageInvestGroup.objects.get(inv_group=kwargs['id'])
+                        manageInvLine.direction_state = True
+                        manageInvLine.save()
+                    except ManageInvestGroup.DoesNotExist:
+                        print("")
                     oldProfessor = Professor.objects.get(id=manageInvLine.professor.pk, status=True)
-                    oldProfessor.is_director_gi = True                    
-                    manageInvLine.save()
+                    oldProfessor.is_director_gi = True
                     oldProfessor.save()  
                     isMember = IsMember.objects.filter(inv_group=kwargs['id']) 
                     for reg in isMember: 
@@ -1166,6 +1184,44 @@ class ConsultKnowledgeArea_idAPI(APIView):
         
         serializer = KnowledgeAreaSerializer(model, data=request.data)
         if serializer.is_valid():
+            if "status" in request.data.keys():
+                if request.data["status"] == False:
+                    workInvGroups = WorksInvestGroup.objects.filter(know_area=kwargs['id'])
+                    for ref in workInvGroups:
+                        aux = WorksInvestGroup.objects.get(inv_group=ref.inv_group, know_area=ref.know_area)
+                        aux.study_status = False
+                        aux.save()
+                    invLines = InvestigationLine.objects.filter(know_area=kwargs['id'])
+                    for ref in invLines:
+                        aux = InvestigationLine.objects.get(id=ref.id)
+                        aux.status = False
+                        aux.save()
+                        manInvLines = ManageInvestLine.objects.filter(inv_line=ref.id)
+                        for refe in manInvLines:
+                            auxi = ManageInvestLine.objects.get(inv_line=refe.inv_line, professor=refe.professor)
+                            auxi.analysis_state = False
+                            auxi.save()
+
+                if request.data["status"] == True:
+                    workInvGroups = WorksInvestGroup.objects.filter(know_area=kwargs['id'])
+                    for ref in workInvGroups:
+                        refInvGroup = InvestigationGroup.objects.filter(id=ref.inv_group, status=True)
+                        if refInvGroup:
+                            aux = WorksInvestGroup.objects.get(inv_group=ref.inv_group, know_area=ref.know_area)
+                            aux.study_status = True
+                            aux.save()
+                    invLines = InvestigationLine.objects.filter(know_area=kwargs['id'])
+                    for ref in invLines:
+                        aux = InvestigationLine.objects.get(id=ref.id)
+                        aux.status = True
+                        aux.save()
+                        manInvLines = ManageInvestLine.objects.filter(inv_line=ref.id)
+                        for refe in manInvLines:
+                            prof = Professor.objects.get(id=refe.professor)
+                            if prof.status == True:
+                                auxi = ManageInvestLine.objects.get(inv_line=refe.inv_line, professor=refe.professor)
+                                auxi.analysis_state = True
+                                auxi.save()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -1197,7 +1253,7 @@ class ConsultInvestigationLine_idAPI(APIView):
     """
     #permission_classes = [IsAuthenticated, IsCoordinator]
     def get(self, request, *args, **kwargs):
-        queryset = InvestigationLine.objects.filter(id=kwargs['id'], status=True)
+        queryset = InvestigationLine.objects.filter(id=kwargs['id'])
         returned = InvestigationLineSerializer(queryset, many=True).data
         if returned:
             return Response({"Line": InvestigationLineSerializer(queryset, many=True).data })
@@ -1206,12 +1262,27 @@ class ConsultInvestigationLine_idAPI(APIView):
 
     def put(self, request, *args, **kwargs):
         try:
-            model = InvestigationLine.objects.get(id=kwargs['id'], status=True)
+            model = InvestigationLine.objects.get(id=kwargs['id'])
         except InvestigationLine.DoesNotExist:
             return Response(f"No existe la Linea de investigacion en la base de datos...")
 
         serializer = InvestigationLineSerializer(model, data=request.data)
         if serializer.is_valid():
+            manInvLine = ManageInvestLine.objects.filter(inv_line=kwargs['id'])
+            if "analysis_state" in request.data.keys():
+                if request.data["analysis_state"] == False:
+                    for ref in manInvLine:
+                        aux = ManageInvestLine.objects.get(inv_line=ref.inv_line, professor=ref.professor)
+                        aux.analysis_state = False
+                        aux.save()
+                
+                if request.data["analysis_state"] == True:
+                    for ref in manInvLine:
+                        prof = Professor.objects.get(id=ref.professor)
+                        if prof.status == True:
+                            aux = ManageInvestLine.objects.get(inv_line=ref.inv_line, professor=ref.professor)
+                            aux.analysis_state = True
+                            aux.save()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
