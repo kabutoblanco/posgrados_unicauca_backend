@@ -6,6 +6,9 @@ from b_activities_app.models import Activity
 from d_accounts_app.models import User
 from a_students_app.models import Program
 from d_information_management_app.models import Professor
+from rest_framework.fields import (  # NOQA # isort:skip
+    CreateOnlyDefault, CurrentUserDefault, SkipField, empty
+)
 
 
 # Serializers
@@ -52,6 +55,16 @@ class ActivitySerializer(serializers.ModelSerializer):
         fields = ("id", "title", "student", "description", "receipt", "state", "type", "start_date", "end_date", "academic_year")
 
 
+class ActivityEnabledSerializer(serializers.ModelSerializer):
+    type = TypeActiviyField(choices=Activity.TYPE_CHOICES)
+    is_enabled = serializers.BooleanField(read_only=True, default=False)
+    student = StudentSerializer()
+
+    class Meta:
+        model = Activity
+        fields = ("is_enabled", "id", "title", "student", "description", "receipt", "state", "type", "start_date", "end_date", "academic_year")
+
+
 class EnrrollmentSerializer(serializers.ModelSerializer):
     student = StudentSerializer()
 
@@ -71,18 +84,9 @@ class TestDirectorSerializer(serializers.ModelSerializer):
         model = TestDirector
         fields = '__all__'
 
-    def create(self, validate_data):
-        validate_data['director'] = Professor.objects.get(user=validate_data['director'].id)
-        test = TestDirector.objects.create(**validate_data)
-        return test
-
 
 class TestCoordinatorSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = TestCoordinator
         fields = '__all__'
-
-    def create(self, validate_data):
-        validate_data['coordinator'] = Professor.objects.get(user=validate_data['coordinator'].id)
-        test = TestCoordinator.objects.create(**validate_data)
-        return test
