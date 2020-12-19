@@ -73,8 +73,13 @@ class Program(models.Model):
 class Student(models.Model):
     DEDICATION_CHOICE = ((1, _("COMPLETO")), (2, _("PARCIAL")))
     dedication = models.IntegerField(choices=DEDICATION_CHOICE, default=1)
-    academic_title=models.CharField(max_length=50)
-    
+    academic_title=models.CharField(max_length=256)
+    instituion_degree = models.CharField(max_length=256)
+    city_intituion = models.CharField(max_length=256)
+    country_intituion = models.CharField(max_length=256)
+    city_origin = models.CharField(max_length=256)
+    departament_origin= models.CharField(max_length=256)
+
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     program = models.ForeignKey(Program, on_delete=models.SET_NULL, blank=True, null=True)

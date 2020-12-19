@@ -51,14 +51,14 @@ class GrantSerializer(serializers.ModelSerializer):
 
 class StudentSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-  
     class Meta:
         model = Student
-        fields = ('id','dedication', 'program','academic_title','date_record','date_update','user')
+        fields = ('id','dedication', 'program','academic_title','instituion_degree','city_intituion','country_intituion','city_origin','departament_origin','date_record','date_update','user')
     def create (self,validated_data):
-        print("sdsadasda")
+        
         user_data = validated_data.pop ('user')
-        user_instance = User.objects.create (**user_data)     
+        user_instance = User.objects.create (**user_data) 
+        user_instance.set_password(user_data.get("password"))    
         student= Student.objects.create ( user= user_instance,**validated_data)
              
         return student

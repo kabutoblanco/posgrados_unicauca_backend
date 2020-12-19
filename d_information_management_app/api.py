@@ -954,6 +954,22 @@ class ConsultInvestigationGroup_DepartmentAPI(APIView):
         queryset = InvestigationGroup.objects.filter(department=kwargs['dep'], status=True)
         return Response({"Groups": InvestigationGroupSerializer(queryset, many=True).data })
 
+class ConsultInvestigationGroup_InstAPI(APIView):
+    """
+    Clase usada para la implementacion de la API para consultar todos los
+    Grupos de Investigacion que pertenecen a un Departamento espesifico de la Universidad,
+    esto se logra enviando el ID del departamento mediante el metodo GET
+    - - - - -
+    Parameter
+    - - - - -
+    dep : int
+        Referencia a un departamento
+    """
+    #permission_classes = [IsAuthenticated, IsCoordinator]
+    def get(self, request, *args, **kwargs):
+        queryset = InvestigationGroup.objects.filter(department__institution=kwargs['id'], status=True)
+        return Response({"Groups": InvestigationGroupSerializer(queryset, many=True).data })
+
 class ConsultInvestigationGroup_idAPI(APIView):
     """
     Clase usada para la implementacion de la API para consultar y editar un Grupo de Investigacion
