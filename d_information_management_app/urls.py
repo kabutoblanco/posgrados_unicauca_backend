@@ -7,22 +7,7 @@ from django.urls import path, include
 #-------------------------------------------------
 
 #Jeison
-from .api import (CreateCountryAPI, CreateStateAPI, CreateCityAPI, CreateInstitutionAPI, CreateProfessorAPI,
-                 CreateFacultyAPI, CreateDepartmentAPI, CreateAcademicTrainingAPI, ConsultManageInvestGroupAPI,
-                 CreateWorksInvestGroupAPI, CreateManageInvestLineAPI, CreateManageInvestGroupAPI,
-                 ConsultCountryAPI, ConsultCountry_idAPI,ConsultState_CountryAPI, ConsultCity_StateAPI,
-                 ConsultInstitutionAPI, ConsultInstitution_idAPI, ConsultIsMemberAPI, ConsultMemberIGAPI,
-                 ConsultProfessorAPI, ConsultProfessor_idAPI, CreateIsMemberAPI, ConsultWorksInvestGroupAPI,
-                 ConsultFacultyAPI, ConsultFaculty_idAPI, ConsultDepartmentAPI, ConsultDepartment_idAPI,
-                 CreateKnowledgeAreaAPI, CreateInvestigationGroupAPI, CreateInvestigationLineAPI, 
-                 ConsultInvestigationGroup_idAPI, ConsultInvestigationGroup_DepartmentAPI, ConsultMemberProfessorAPI,
-                 ConsultKnowledgeAreaAPI, ConsultKnowledgeArea_idAPI, ConsultInvestigationLine_knowledgeAPI,
-                 ConsultInvestigationLine_idAPI, ConsultManageInvestGroup_DirecAPI, ConsultManageInvestGroup_GIAPI,
-                 ConsultWorksInvestGroup_GIAPI,ReportTest, ConsultWorksDepartmAPI, ConsultWorksDepartm_profAPI,
-                 ConsultWorksDepartm_depAPI, ConsultManageInvestLineAPI, ConsultManageInvestLine_invLineAPI, 
-                 ConsultManageInvestLine_profAPI, ConsultProfessor_userAPI, CreateCoordinatorProgramAPI,
-                 ConsultCoordinatorAPI,FullConsultCountryAPI,FullConsultState_CountryAPI,FullConsultCity_StateAPI,
-                 FullConsultInstitutionAPI, CreateWorkDepartmentAPI)
+from .api import *
 
 urlpatterns = [
     #Javier
@@ -64,6 +49,7 @@ urlpatterns = [
     path('api/1.0/crear_coordinador/', CreateCoordinatorProgramAPI.as_view()),
     # falta todo lo relacionado con labora, desde crear hasta editar
     #Consultar
+    path('api/1.0/consultar_gi_ins/<int:id>', ConsultInvestigationGroup_InstAPI.as_view()),
     path('api/1.0/consultar_gi_dep/<int:dep>', ConsultInvestigationGroup_DepartmentAPI.as_view()),
     path('api/1.0/consultar_gi_id/<int:id>', ConsultInvestigationGroup_idAPI.as_view()),
     path('api/1.0/consultar_area_conocimiento/', ConsultKnowledgeAreaAPI.as_view()),
