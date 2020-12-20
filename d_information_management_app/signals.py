@@ -1,6 +1,6 @@
 from d_accounts_app.models import User
 from .models import *
-from a_students_app.models import Student, StudentGroupInvestigation
+from a_students_app.models import Student, StudentGroupInvestigation, Program
 
 
 def change_country(sender, instance, created, **kwargs):
@@ -50,6 +50,14 @@ def change_professor(sender, instance, created, **kwargs):
         for manage in queryset:
             manage.direction_state = False
             manage.save()
+        queryset = WorksDepartm.objects.filter(professor=instance.id)
+        for works in queryset:
+            works.laboral_state = False
+            wokrs.save()
+        queryset = CoordinatorProgram.objects.filter(professor=instance.id)
+        for coord in queryset:
+            coord.is_active = False
+            coord.save()
     else:
         queryset = IsMember.objects.filter(professor=instance.id)
         for professor in queryset:
@@ -63,6 +71,18 @@ def change_professor(sender, instance, created, **kwargs):
         for manage in queryset:
             manage.direction_state = True
             manage.save()
+        queryset = WorksDepartm.objects.filter(professor=instance.id)
+        for works in queryset:
+            aux = Department.objects.filter(id=works.department.id, status=True)
+            if aux:
+                works.laboral_state = False
+                wokrs.save()
+        queryset = CoordinatorProgram.objects.filter(professor=instance.id)
+        for coord in queryset:
+            aux = Program.objects.filter(id=coord.program.id, is_active=True)
+            if aux:
+                coord.is_active = False
+                coord.save()
 
 def change_inv_group(sender, instance, created, **kwargs):
     if not instance.status:

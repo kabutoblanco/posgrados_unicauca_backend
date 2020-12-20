@@ -79,13 +79,13 @@ class ConsultUser_idAPI(APIView):
 class AuthUserAPI(APIView):
     def get(self, request, *args, **kwargs):
         typeList = ["Usuario sin rol"]
-        try:
-            CoordinatorProgram.objects.get(professor__user=kwargs['id'], professor__status=True)
-            typeList.append("coordinador")
+        
+        aux = CoordinatorProgram.objects.filter(professor__user=kwargs['id'], professor__status=True)
+        if aux:
             if "Usuario sin rol" in typeList:
 	            typeList.remove("Usuario sin rol")
-        except CoordinatorProgram.DoesNotExist:
-            pass
+            typeList.append("coordinador")
+        
         try:
             ManageInvestGroup.objects.get(professor__user=kwargs['id'], professor__status=True)
             if "Usuario sin rol" in typeList:
