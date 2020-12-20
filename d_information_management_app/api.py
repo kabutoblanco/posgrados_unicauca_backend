@@ -646,7 +646,7 @@ class ConsultInvestigationGroup_InstAPI(APIView):
     """
     #permission_classes = [IsAuthenticated, IsCoordinator]
     def get(self, request, *args, **kwargs):
-        queryset = InvestigationGroup.objects.filter(department__institution=kwargs['id'], status=True)
+        queryset = InvestigationGroup.objects.filter(department__faculty__institution=kwargs['id'], status=True)
         return Response({"Groups": InvestigationGroupSerializer(queryset, many=True).data })
 
 #profesores
