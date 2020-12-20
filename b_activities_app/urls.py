@@ -27,7 +27,7 @@ urlpatterns = [
     path( 'api/', include(router.urls) ),
     
     # Otro tipo de Consultas #
-    path( 'api/report7ac/', ReportTest.as_view()),
+    path( 'api/report7ac/<int:type>/', ReportTest.as_view()),
     path( 'api/testDirector/<int:id_activity>/', TestDirectorAPI.as_view() ),
     path( 'api/testCoordinator/<int:id_activity>/', TestCoordinatorAPI.as_view() ),
     path( 'api/period/student/<int:id_user>/', PeriodAPI.as_view() ),
