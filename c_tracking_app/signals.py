@@ -32,8 +32,8 @@ def save_or_send_testdirector(sender, instance, created, **kwargs):
             activity.save()
     except:
         if created:
-            raise CustomException('No se pudo asignar actividad al coordinador', 'detail', status.HTTP_409_CONFLICT)
-        raise CustomException('No se pudo notificar al coordinador', 'detail', status.HTTP_409_CONFLICT)
+            raise CustomException('No se pudo asignar actividad al coordinador', 'detail', status.HTTP_204_NO_CONTENT)
+        raise CustomException('No se pudo notificar al coordinador', 'detail', status.HTTP_204_NO_CONTENT)
 
 
 def save_or_send_testcoordinator(sender, instance, created, **kwargs):
@@ -48,7 +48,7 @@ def save_or_send_testcoordinator(sender, instance, created, **kwargs):
             student = instance.activity.student
             send_email_to_student(professor, student, instance)
     except:
-        raise CustomException('No se pudo notificar al estudiante', 'detail', status.HTTP_409_CONFLICT)
+        raise CustomException('No se pudo notificar al estudiante', 'detail', status.HTTP_204_NO_CONTENT)
 
 
 def update_tracking(sender, instance, created, **kwargs):
@@ -59,4 +59,4 @@ def update_tracking(sender, instance, created, **kwargs):
         enrrollment.state = instance.status
         enrrollment.save()
     except Enrrollment.DoesNotExist:
-        raise CustomException('No se pudo modificar matricula', 'detail', status.HTTP_409_CONFLICT)    
+        raise CustomException('No se pudo modificar matricula', 'detail', status.HTTP_204_NO_CONTENT)    

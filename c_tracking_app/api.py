@@ -22,11 +22,14 @@ from reportlab.platypus import Table, TableStyle
 from reportlab.platypus.paragraph import Paragraph
 
 from a_students_app.models import StudentProfessor
+from d_information_management_app.models import CoordinatorProgram
 
 from .backends import IsDirector, IsCoordinador
 from .models import *
 from .serializers import *
 from .signals import *
+
+from util.exception import CustomException
 
 post_save.connect(save_or_send_testdirector, sender=TestDirector)
 post_save.connect(save_or_send_testcoordinator, sender=TestCoordinator)
@@ -74,12 +77,16 @@ class StudentListAPI(generics.ListAPIView):
     serializer_class = EnrrollmentSerializer
 
     def get(self, request, *args, **kwargs):
-        queryset = Student.objects.filter(is_active=True)
-        queryset_list = Enrrollment.objects.none()
-        for student in queryset:
-            queryset_list = queryset_list | Enrrollment.objects.filter(
-                student=student).order_by('-period')[:1]
-        return Response({"students": self.get_serializer(queryset_list, many=True).data})
+        try:
+            queryset = CoordinatorProgram.objects.get(professor__user=kwargs['id_professor'], is_active=True)
+            queryset = Student.objects.filter(program=queryset.program, is_active=True)
+            queryset_list = Enrrollment.objects.none()
+            for student in queryset:
+                queryset_list = queryset_list | Enrrollment.objects.filter(
+                    student=student).order_by('-period')[:1]
+            return Response({"students": self.get_serializer(queryset_list, many=True).data})
+        except CoordinatorProgram.DoesNotExist:
+            raise CustomException('No existe el coordinador', 'detail', status.HTTP_204_NO_CONTENT)
 
 
 class TrackingAPI(viewsets.ModelViewSet):
@@ -184,7 +191,7 @@ class DirectorActiviesAPI(generics.RetrieveAPIView):
     serializer_class = ActivitySerializer
 
     def get(self, request, *args, **kwargs):
-        queryset = ActivityProfessor.objects.filter(Q(rol=1) | Q(rol=2))
+        queryset = ActivityProfessor.objects.filter(Q(rol=1) | Q(rol=2), is_active=True)
         queryset = queryset.filter(
             professor__user=kwargs['id_professor'], is_active=True).values('activity')
         list = [e['activity'] for e in queryset]
@@ -214,21 +221,27 @@ class CoordinatorActivitiesAPI(generics.RetrieveAPIView):
     serializer_class = ActivityEnabledSerializer
 
     def get(self, request, *args, **kwargs):
-        user = kwargs['id_professor']
-        queryset = ActivityProfessor.objects.filter(
-            professor__user=user, rol=3, is_active=True).values('activity')
-        program = CoordinatorProgram.objects.get(professor__user=user).program
-        queryset_aux = ActivityProfessor.objects.filter(activity__student__program=program, is_active=True).values('activity').annotate(Count('activity')).values('activity')
-        queryset_list = []
-        for activity_professor_i in queryset_aux:
-            activity = Activity.objects.get(pk=activity_professor_i["activity"])      
-            print(queryset.values('activity'))
-            activity_serializer = self.get_serializer(activity, context=self.get_serializer_context()).data
-            if activity_professor_i in queryset:        
-                activity_serializer['is_enabled'] = True
-            else:            
-                activity_serializer['is_enabled'] = False
-            queryset_list.append(activity_serializer)
+        queryset = ActivityProfessor.objects.filter(rol=3, is_active=True)
+        queryset = queryset.filter(
+            professor__user=kwargs['id_professor'], is_active=True).values('activity')
+        list = [e['activity'] for e in queryset]
+        queryset_list = Activity.objects.filter(
+            is_active=True, id__in=list)
+        # user = kwargs['id_professor']
+        # queryset = ActivityProfessor.objects.filter(
+        #     professor__user=user, rol=3, is_active=True).values('activity')
+        # program = CoordinatorProgram.objects.get(professor__user=user).program
+        # queryset_aux = ActivityProfessor.objects.filter(activity__student__program=program, is_active=True).values('activity').annotate(Count('activity')).values('activity')
+        # queryset_list = []
+        # for activity_professor_i in queryset_aux:
+        #     activity = Activity.objects.get(pk=activity_professor_i["activity"])      
+        #     print(queryset.values('activity'))
+        #     activity_serializer = self.get_serializer(activity, context=self.get_serializer_context()).data
+        #     if activity_professor_i in queryset:        
+        #         activity_serializer['is_enabled'] = True
+        #     else:            
+        #         activity_serializer['is_enabled'] = False
+        #     queryset_list.append(activity_serializer)
         return Response({"activities": queryset_list})
 # - - - - - SEGUNDO SPRINT - - - - -
 

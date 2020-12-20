@@ -13,7 +13,7 @@ router.register('test_coordinator', TestCoordinatorAPI)
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    path('api/student', StudentListAPI.as_view()),
+    path('api/coordinator/<int:id_professor>/student', StudentListAPI.as_view()),
     path('api/student/<int:id_student>', StudentAPI.as_view()),
     path('api/student/<int:id_student>/activity', ActivityListStudentAPI.as_view()),
 
