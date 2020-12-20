@@ -37,7 +37,6 @@ def change_city(sender, instance, created, **kwargs):
             institution.save()
 
 def change_professor(sender, instance, created, **kwargs):
-    querysetUser = User.objects.get(pk=instance.user.id)
     if not instance.status:
         queryset = IsMember.objects.filter(professor=instance.id)
         for professor in queryset:
@@ -51,7 +50,6 @@ def change_professor(sender, instance, created, **kwargs):
         for manage in queryset:
             manage.direction_state = False
             manage.save()
-        querysetUser.is_proffessor = False
     else:
         queryset = IsMember.objects.filter(professor=instance.id)
         for professor in queryset:
@@ -65,8 +63,6 @@ def change_professor(sender, instance, created, **kwargs):
         for manage in queryset:
             manage.direction_state = True
             manage.save()
-        querysetUser.is_proffessor = True
-    querysetUser.save()
 
 def change_inv_group(sender, instance, created, **kwargs):
     if not instance.status:
