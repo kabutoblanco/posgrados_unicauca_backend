@@ -86,13 +86,13 @@ class AuthUserAPI(APIView):
 	            typeList.remove("Usuario sin rol")
             typeList.append("coordinador")
         
-        try:
-            ManageInvestGroup.objects.get(professor__user=kwargs['id'], professor__status=True)
+        
+        aux = ManageInvestGroup.objects.filter(professor__user=kwargs['id'], professor__status=True)
+        if aux:
             if "Usuario sin rol" in typeList:
 	            typeList.remove("Usuario sin rol")
             typeList.append("director_gi")
-        except ManageInvestGroup.DoesNotExist:
-            pass
+        
         
         aux = StudentProfessor.objects.filter(professor__user=kwargs['id'], professor__status=True)
         if aux:

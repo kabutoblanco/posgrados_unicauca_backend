@@ -53,7 +53,7 @@ def change_professor(sender, instance, created, **kwargs):
         queryset = WorksDepartm.objects.filter(professor=instance.id)
         for works in queryset:
             works.laboral_state = False
-            wokrs.save()
+            works.save()
         queryset = CoordinatorProgram.objects.filter(professor=instance.id)
         for coord in queryset:
             coord.is_active = False
@@ -76,7 +76,7 @@ def change_professor(sender, instance, created, **kwargs):
             aux = Department.objects.filter(id=works.department.id, status=True)
             if aux:
                 works.laboral_state = False
-                wokrs.save()
+                works.save()
         queryset = CoordinatorProgram.objects.filter(professor=instance.id)
         for coord in queryset:
             aux = Program.objects.filter(id=coord.program.id, is_active=True)
@@ -90,15 +90,12 @@ def change_inv_group(sender, instance, created, **kwargs):
         for work in queryset:
             work.study_status = False
             work.save()
-        try:
-            queryset = ManageInvestGroup.objects.get(inv_group=instance.id, direction_state=True)
-            queryset.direction_state = False
-            queryset.save()
-            oldProfessor = Professor.objects.get(id=queryset.professor.pk, status=True)
-            oldProfessor.is_director_gi = False
-            oldProfessor.save()
-        except:
-            pass
+        
+        queryset = ManageInvestGroup.objects.filter(inv_group=instance.id, direction_state=True)
+        for manage in queryset:
+            manage.direction_state = False
+            manage.save()
+        
         queryset = IsMember.objects.filter(inv_group=instance.id) 
         for member in queryset:
             member.is_active = False
@@ -112,15 +109,10 @@ def change_inv_group(sender, instance, created, **kwargs):
         for work in queryset:
             work.study_status = True
             work.save()
-        try:
-            queryset = ManageInvestGroup.objects.get(inv_group=instance.id, direction_state=True)
-            queryset.direction_state = True
-            queryset.save()
-            oldProfessor = Professor.objects.get(id=queryset.professor.pk, status=True)
-            oldProfessor.is_director_gi = True
-            oldProfessor.save()
-        except:
-            pass
+        queryset = ManageInvestGroup.objects.filter(inv_group=instance.id, direction_state=True)
+        for manage in queryset:
+            manage.direction_state = True
+            manage.save()
         queryset = IsMember.objects.filter(inv_group=instance.id) 
         for member in queryset:
             aux = Professor.objects.filter(id=member.professor.id, status=True)

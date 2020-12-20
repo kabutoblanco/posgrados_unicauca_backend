@@ -681,12 +681,37 @@ class ConsultProfessor_userAPI(APIView):
         else:
             return Response(f"No existe el Profesor en la base de datos", status=status.HTTP_404_NOT_FOUND)
 
-class ConsultProfessorDirectorGIAPI(APIView): #revisar
+class ConsultProfessorDirectorGIAPI(APIView):
     def get(self, request, *args, **kwargs):
         filterProf = WorksDepartm.objects.filter(laboral_category="planta", professor__is_internal=True)
         queryset = []
         for ref in filterProf:
-            aux = Professor.objects.filter(id=ref.professor, status=True)
+            aux = Professor.objects.filter(id=ref.professor.id)
+            if aux:
+                queryset.extend(aux)
+        return Response({"Professors": ProfessorSerializer(queryset, many=True).data })
+
+class ConsultProfessorDirectorStudentAPI(APIView):
+    def get(self, request, *args, **kwargs):
+        filterProf = WorksDepartm.objects.filter(laboral_category="planta", professor__is_internal=True)
+        filterProf2 = WorksDepartm.objects.filter(laboral_category="catedra", professor__is_internal=True)
+        queryset = []
+        for ref in filterProf:
+            aux = Professor.objects.filter(id=ref.professor.id)
+            if aux:
+                queryset.extend(aux)
+        for ref in filterProf2:
+            aux = Professor.objects.filter(id=ref.professor.id)
+            if aux:
+                queryset.extend(aux)
+        return Response({"Professors": ProfessorSerializer(queryset, many=True).data })
+
+class ConsultProfessorCoodirectorPlantaAPI(APIView):
+    def get(self, request, *args, **kwargs):
+        filterProf = WorksDepartm.objects.filter(laboral_category="planta")
+        queryset = []
+        for ref in filterProf:
+            aux = Professor.objects.filter(id=ref.professor.id)
             if aux:
                 queryset.extend(aux)
         return Response({"Professors": ProfessorSerializer(queryset, many=True).data })
@@ -1036,7 +1061,7 @@ class ConsultWorksDepartmAPI(APIView):
         Referencia a un Departamento de la Universidad
     """
     def get(self, request, *args, **kwargs):
-        queryset = WorksDepartm.objects.filter(professor=kwargs['id_p'], department=kwargs['id_d'], laboral_state=True)
+        queryset = WorksDepartm.objects.filter(professor=kwargs['id_p'], department=kwargs['id_d'])
         returned = WorksDepartmSerializer(queryset, many=True).data
         if returned:
             return Response(returned, status=status.HTTP_202_ACCEPTED)
@@ -1045,7 +1070,7 @@ class ConsultWorksDepartmAPI(APIView):
     
     def put(self, request, *args, **kwargs):
         try:
-            model = WorksDepartm.objects.filter(professor=kwargs['id_p'], department=kwargs['id_d'], laboral_state=True)
+            model = WorksDepartm.objects.filter(professor=kwargs['id_p'], department=kwargs['id_d'])
         except WorksDepartm.DoesNotExist:
             return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
         
@@ -1157,17 +1182,11 @@ class ConsultCoordinatorAPI(APIView):
     def put(self, request, *args, **kwargs):
         try:
             model = CoordinatorProgram.objects.get(program=kwargs['prog'], academic_period=kwargs['period'])
-        except AcademicTraining.DoesNotExist:
+        except CoordinatorProgram.DoesNotExist:
             return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
         
         serializer = CoordinatorProgramSerializer(model, data=request.data)
         if serializer.is_valid():
-            if 'status' in request.data.keys():
-                if request.data['is_active'] == False:
-                    coordinator = Professor.objects.get(id=request.data['professor'])
-                    userCoordinator = User.objects.get(id=coordinator.user.pk)
-                    userCoordinator.is_coordinator = False
-                    userCoordinator.save()
             model.date_update = datetime.datetime.now()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
