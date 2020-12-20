@@ -54,7 +54,7 @@ class ReportTest(APIView):
            
         year = kwargs["year"]
         queryset = Enrrollment.objects.filter(admission_date__range=(str(year)+"-1-1",str(year)+"-12-31"))
-        now = datetime.now()
+        now = datetime.datetime.now()
 
         if(kwargs["type"]==1):#Format xlsx request.data["tipo"]==1
             wb = Workbook()
@@ -742,6 +742,25 @@ class ConsultInvestigationLine_knowledgeAPI(APIView):
         else:
             return Response(f"No existen Lineas de Investigacion asociadas a esa Area del conocimiento...")
 
+class ConsultInvestigationLine_GIAPI(APIView):
+    """
+    Clase usada para la implementacion de la API para consultar todas las Lineas de Investigacion que
+    pertenecen a un Area del conocimiento espesifica
+    """
+    #permission_classes = [IsAuthenticated, IsCoordinator]
+    def get(self, request, *args, **kwargs):
+        know_filter = WorksInvestGroup.objects.filter(inv_group=kwargs['id_gi'])
+        queryset = []
+        for work in know_filter:
+            aux = InvestigationLine.objects.filter(know_area=work.know_area, status=True)
+            if aux:
+                queryset.extend(aux)
+        returned = InvestigationLineSerializer(queryset, many=True).data
+        if returned:
+            return Response({"Lines": InvestigationLineSerializer(queryset, many=True).data })
+        else:
+            return Response(f"No existen Lineas de Investigacion asociadas a esa Area del conocimiento...")
+
 # Es miembro
 class ConsultIsMemberAPI(APIView):
     """
@@ -1070,7 +1089,7 @@ class ConsultWorksDepartmAPI(APIView):
     
     def put(self, request, *args, **kwargs):
         try:
-            model = WorksDepartm.objects.filter(professor=kwargs['id_p'], department=kwargs['id_d'])
+            model = WorksDepartm.objects.get(professor=kwargs['id_p'], department=kwargs['id_d'])
         except WorksDepartm.DoesNotExist:
             return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
         

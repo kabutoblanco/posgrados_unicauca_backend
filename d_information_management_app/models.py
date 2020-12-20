@@ -207,6 +207,7 @@ class Professor(models.Model):
     is_internal = models.BooleanField(default=False)
     status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
+        unique_together = ("user", "institution", "department")
         verbose_name = 'Profesor'
         verbose_name_plural = 'Profesores'
     
