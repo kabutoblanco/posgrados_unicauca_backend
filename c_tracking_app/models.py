@@ -210,6 +210,7 @@ class ActivityProfessor(models.Model):
     class Meta:
         verbose_name = 'Actividad de un profesor'
         verbose_name_plural = 'Actividades de un profesor'
+        unique_together = ('activity', 'professor', 'rol')
 
     def __str__(self):
         return '[{}] {} | {} | {}'.format(self.id, self.activity, self.professor, self.rol)
