@@ -192,6 +192,9 @@ class IsMemberSerializer(serializers.ModelSerializer):
         return instance
 
 class WorksDepartmSerializer(serializers.ModelSerializer):
+    laboral_category = serializers.CharField(required=False)
+    time_category = serializers.CharField(required=False)
+    laboral_state = serializers.BooleanField(required=False)
     class Meta:
         model = WorksDepartm
         fields = '__all__'
