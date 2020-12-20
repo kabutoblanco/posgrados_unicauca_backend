@@ -76,7 +76,7 @@ def change_professor(sender, instance, created, **kwargs):
             aux = Department.objects.filter(id=works.department.id, status=True)
             if aux:
                 works.laboral_state = False
-                wokrs.save()
+                works.save()
         queryset = CoordinatorProgram.objects.filter(professor=instance.id)
         for coord in queryset:
             aux = Program.objects.filter(id=coord.program.id, is_active=True)
