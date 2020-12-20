@@ -58,9 +58,10 @@ class StudentSerializer(serializers.ModelSerializer):
         
         user_data = validated_data.pop ('user')
         user_instance = User.objects.create (**user_data) 
-        user_instance.set_password(user_data.get("password"))    
+        user_instance.set_password(user_data.get("password")) 
+        user_instance.save()   
         student= Student.objects.create ( user= user_instance,**validated_data)
-             
+        student.save()     
         return student
 
     '''def update(self, instance, validated_data):
@@ -76,34 +77,45 @@ class StudentSerializer(serializers.ModelSerializer):
 class UpdateStudentSerializer(serializers.ModelSerializer):
     dedication = serializers.IntegerField(required=False)
     academic_title = serializers.CharField(required=False)
+    instituion_degree = serializers.CharField(required=False)
+    city_intituion = serializers.CharField(required=False)
+    country_intituion = serializers.CharField(required=False)
+    city_origin = serializers.CharField(required=False)
+    departament_origin= serializers.CharField(required=False)
     
     class Meta:
         model = Student
-        fields = ('dedication', 'program','user','academic_title')
+        fields = ('dedication', 'program','user','academic_title','instituion_degree','city_intituion','country_intituion','city_origin','departament_origin')
 
 class UpdateGrant(serializers.ModelSerializer):
     long = serializers.IntegerField(required=False)
     start_date = serializers.DateField(required=False)
     end_date = serializers.DateField(required=False)
+    voucher = serializers.FileField(required=False)
     name = serializers.CharField(required=False)
     announcement = serializers.IntegerField(required=False)
     description = serializers.CharField(required=False)
     num_resolution = serializers.CharField(required=False)
+    name_institution = serializers.CharField(required=False)
+    type_institution = serializers.IntegerField(required=False)
+    location_institution = serializers.IntegerField(required=False)
+
     class Meta:
         model = Grant
-        fields = ('long','start_date','end_date','name', 'announcement','description','num_resolution')
+        fields = ('long','start_date','end_date','name','voucher','announcement','description','num_resolution','name_institution','type_institution','location_institution')
 
 class UpdateAgreement(serializers.ModelSerializer):
     long = serializers.IntegerField(required=False)
     start_date = serializers.DateField(required=False)
     end_date = serializers.DateField(required=False)
+    voucher = serializers.FileField(required=False)
     agreement_date = serializers.DateField(required=False)
     period_academic = serializers.CharField(required=False)
     percentage_discount = serializers.FloatField(required=False)
     observation = serializers.CharField(required=False)
     class Meta:
         model = Agreement
-        fields = ('long','start_date','end_date','agreement_date', 'period_academic','percentage_discount','observation')
+        fields = ('long','start_date','end_date','voucher','agreement_date', 'period_academic','percentage_discount','observation')
     
 class UpdateStudentProfessor(serializers.ModelSerializer):
     rol = serializers.IntegerField(required=False)

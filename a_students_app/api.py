@@ -188,9 +188,6 @@ class CreateStudentProfessor(generics.GenericAPIView):
                 professor=request.data["professor"], rol= request.data["rol"])
             
                 if not(isdirector):
-                    auxprofessor = Professor.objects.get(id=request.data["professor"])
-                    auxprofessor.is_director_student=True
-                    auxprofessor.save()
                     serializer.save()
                     return Response(serializer.data,status=status.HTTP_201_CREATED)
                 return Response(f"Ya cuenta con su director",status=status.HTTP_400_BAD_REQUEST)
@@ -198,9 +195,6 @@ class CreateStudentProfessor(generics.GenericAPIView):
                 
                 iscodirector= StudentProfessor.objects.filter(student=request.data["student"], rol= request.data["rol"]) 
                 if (len(iscodirector)<2):
-                    auxprofessor = Professor.objects.get(id=request.data["professor"])
-                    auxprofessor.is_director_student=True
-                    auxprofessor.save()
                     serializer.save()
                     return Response(serializer.data,status=status.HTTP_201_CREATED)
                 return Response(f"Ya cuenta con dos coodirectores",status=status.HTTP_400_BAD_REQUEST)

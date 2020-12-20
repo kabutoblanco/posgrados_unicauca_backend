@@ -11,8 +11,10 @@ class GrantAgreement(models.Model):
     long = models.IntegerField(default=0)
     start_date = models.DateField(auto_now=False)
     end_date = models.DateField(auto_now=False)
+    
 
     student = models.ForeignKey ('Student', on_delete=models.SET_NULL, blank=True, null=True)
+    voucher = models.FileField (verbose_name='Comprobante', upload_to="voucher/%Y/%m/%d")
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -30,10 +32,15 @@ class GrantAgreement(models.Model):
 
 class Grant(GrantAgreement):
     name = models.CharField(max_length=48)
-    announcement = models.IntegerField(default=0)
+    announcement = models.IntegerField(default=0)#numero de convocatoria
     description = models.CharField(max_length=48)
     num_resolution = models.CharField(max_length=48)
-
+    name_institution=models.CharField(max_length=60)#nombre de la institucion
+    INSTITUTION_CHOICE = ((1, _("PUBLICA")), (2, _("PRIVADA")))
+    type_institution= models.IntegerField(choices=INSTITUTION_CHOICE, default=1)
+    INSTITUTIONLOCA_CHOICE = ((1, _("NACIONAL")), (2, _("EXTRANJERA")))
+    location_institution= models.IntegerField(choices=INSTITUTIONLOCA_CHOICE, default=1)
+    
        
 
     class Meta:
@@ -83,8 +90,7 @@ class Student(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     program = models.ForeignKey(Program, on_delete=models.SET_NULL, blank=True, null=True)
-    ##institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
-
+    
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
@@ -102,7 +108,7 @@ class Enrrollment(models.Model):
                     (3, _("GRADUADO")), (4, _("BALANCEADO")), (5, _("RETIRADO")))
 
     admission_date = models.DateField(auto_now=False)
-    enrrollment_date = models.DateField(auto_now=False)
+    enrrollment_date = models.DateField(auto_now=True)
     state = models.IntegerField(choices=TYPE_CHOICES)
     period = models.CharField(max_length=24)
 
