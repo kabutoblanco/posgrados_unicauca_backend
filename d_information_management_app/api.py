@@ -54,7 +54,7 @@ class ReportTest(APIView):
            
         year = kwargs["year"]
         queryset = Enrrollment.objects.filter(admission_date__range=(str(year)+"-1-1",str(year)+"-12-31"))
-        now = datetime.now()
+        now = datetime.datetime.now()
 
         if(kwargs["type"]==1):#Format xlsx request.data["tipo"]==1
             wb = Workbook()
