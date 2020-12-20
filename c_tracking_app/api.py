@@ -1,10 +1,10 @@
 from io import BytesIO
 
 from django.db.models import Count, Q
+from django.db.models.query import QuerySet
 from django.db.models.signals import post_save
 from django.http.response import HttpResponse
 from django.views.generic.base import TemplateView
-from django.db.models.query import QuerySet
 
 from rest_framework import generics, status, views, viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -218,10 +218,11 @@ class CoordinatorActivitiesAPI(generics.RetrieveAPIView):
         queryset = ActivityProfessor.objects.filter(
             professor__user=user, rol=3, is_active=True).values('activity')
         program = CoordinatorProgram.objects.get(professor__user=user).program
-        queryset_aux = ActivityProfessor.objects.filter(activity__student__program=program, is_active=True).values('activity')
+        queryset_aux = ActivityProfessor.objects.filter(activity__student__program=program, is_active=True).values('activity').annotate(Count('activity')).values('activity')
         queryset_list = []
         for activity_professor_i in queryset_aux:
             activity = Activity.objects.get(pk=activity_professor_i["activity"])      
+            print(queryset.values('activity'))
             activity_serializer = self.get_serializer(activity, context=self.get_serializer_context()).data
             if activity_professor_i in queryset:        
                 activity_serializer['is_enabled'] = True
