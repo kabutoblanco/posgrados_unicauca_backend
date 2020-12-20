@@ -64,7 +64,7 @@ class Activity(models.Model):
     type = models.IntegerField(choices=TYPE_CHOICES, default=1) 
     status_check = models.BooleanField(default=False)
 
-    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
 
     date_record = models.DateTimeField(auto_now=False)
     date_update = models.DateTimeField(auto_now=False) 
@@ -92,7 +92,7 @@ class Lecture(Activity):
     """
     place = models.CharField(max_length=40, blank=False, null=False)
 
-    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name='Ponencia en congreso / Simposio / Jornada'
@@ -139,7 +139,7 @@ class ProjectCourse(Activity):
     """
     assigned_hours = models.PositiveIntegerField(blank=False, null=False)
 
-    program = models.ForeignKey(Program, on_delete=models.SET_NULL, blank=False, null=True)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name='Curso / Direccion de proyectos / Revision de proyectos'
@@ -167,9 +167,9 @@ class ResearchStays(Activity):
     purpose = models.CharField(max_length=100, blank=False, null=False)
     responsible = models.CharField(max_length=60, blank=False, null=False)
 
-    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, blank=False, null=True)
-    #country = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=False, null=True)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
+    #country = models.ForeignKey(Country, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name='Estancia de investigación en otras instituciones'
@@ -224,8 +224,8 @@ class ParticipationProjects(Activity):
     convocation = models.CharField(max_length=148, blank=False, null=False)
     type_convocation = models.CharField(max_length=20, blank=False, null=False)
 
-    investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True)
-    investigator = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
+    investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.CASCADE)
+    investigator = models.ForeignKey(Professor, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name='Participación en proyecto de investigación'
@@ -252,7 +252,7 @@ class Prize(models.Model):
     """
     name = models.CharField(max_length=40, blank=False, null=False, unique=True)
 
-    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, blank=False, null=True)
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
