@@ -686,7 +686,7 @@ class ConsultProfessorDirectorGIAPI(APIView): #revisar
         filterProf = WorksDepartm.objects.filter(laboral_category="planta", professor__is_internal=True)
         queryset = []
         for ref in filterProf:
-            aux = Professor.objects.filter(id=ref.professor, status=True)
+            aux = Professor.objects.filter(id=ref.professor.id, status=True)
             if aux:
                 queryset.extend(aux)
         return Response({"Professors": ProfessorSerializer(queryset, many=True).data })

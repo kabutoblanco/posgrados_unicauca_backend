@@ -457,9 +457,11 @@ class WorksDepartm(models.Model):
         Referencia a un profesor
     department : int
         Referencia a un departamento de la universidad
-    laboral_category : string[50]
+    laboral_category : string[20]
         Tipo de categoria laboral en la que se encuentra el profeosor dentro de la universidad 
         (es escrita por el usuario, no hay categorias predefinidas)
+    time_category : string[20]
+        Tipo de tiempo de trabajo (medio tiempo o tiempo completo)
     laboral_state : boolean
         Estado de la relacion en la cual el profesor es labora o no de un departamento de la universidad
     """
