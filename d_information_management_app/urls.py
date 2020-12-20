@@ -52,6 +52,7 @@ urlpatterns = [
     path('api/1.0/consultar_gi_dep/<int:dep>', ConsultInvestigationGroup_DepartmentAPI.as_view()),
     path('api/1.0/consultar_area_conocimiento/', ConsultKnowledgeAreaAPI.as_view()),
     path('api/1.0/consultar_li_area/<int:id_area>', ConsultInvestigationLine_knowledgeAPI.as_view()),
+    path('api/1.0/consultar_li_gi/<int:id_gi>', ConsultInvestigationLine_GIAPI.as_view()),
     # Profesor
     path('api/1.0/profesor_director_gi/', ConsultProfessorDirectorGIAPI.as_view()),
     path('api/1.0/profesor_director_s/', ConsultProfessorDirectorStudentAPI.as_view()),

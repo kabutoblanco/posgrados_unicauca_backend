@@ -742,6 +742,25 @@ class ConsultInvestigationLine_knowledgeAPI(APIView):
         else:
             return Response(f"No existen Lineas de Investigacion asociadas a esa Area del conocimiento...")
 
+class ConsultInvestigationLine_GIAPI(APIView):
+    """
+    Clase usada para la implementacion de la API para consultar todas las Lineas de Investigacion que
+    pertenecen a un Area del conocimiento espesifica
+    """
+    #permission_classes = [IsAuthenticated, IsCoordinator]
+    def get(self, request, *args, **kwargs):
+        know_filter = WorksInvestGroup.objects.filter(inv_group=kwargs['id_gi'])
+        queryset = []
+        for work in know_filter:
+            aux = InvestigationLine.objects.filter(know_area=work.know_area, status=True)
+            if aux:
+                queryset.extend(aux)
+        returned = InvestigationLineSerializer(queryset, many=True).data
+        if returned:
+            return Response({"Lines": InvestigationLineSerializer(queryset, many=True).data })
+        else:
+            return Response(f"No existen Lineas de Investigacion asociadas a esa Area del conocimiento...")
+
 # Es miembro
 class ConsultIsMemberAPI(APIView):
     """
