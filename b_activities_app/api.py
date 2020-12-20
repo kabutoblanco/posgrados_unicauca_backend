@@ -20,7 +20,7 @@ from .email import *
 from a_students_app.models import Program
 from a_students_app.models import Student, Enrrollment
 from c_tracking_app.models import TestDirector, TestCoordinator
-from d_information_management_app.models import Institution, InvestigationLine, Professor, City, Country, ManageInvestLine
+from d_information_management_app.models import Institution, InvestigationLine, Professor, City, Country, ManageInvestLine, WorksDepartm
 from d_accounts_app.models import User
 
 import json
@@ -74,6 +74,7 @@ class ReportTest(APIView):
         queryProfessors = Professor.objects.filter(is_internal=True)
         queryInitialPeriod = Enrrollment.objects.all().values('period').order_by('period')[:1]
         queryFinalPeriod = Enrrollment.objects.all().values('period').order_by('-period')[:1]
+        queryDirectors = WorksDepartm.objects.filter(laboral_category="planta", professor__is_internal=True) | WorksDepartm.objects.filter(laboral_category="catedra", professor__is_internal=True)
         
         InitialPeriod = 0
         FinalPeriod = 0
@@ -282,9 +283,12 @@ class ReportTest(APIView):
 
                 ws.cell(row =defController, column=2).value = q.user.first_name +" "+ q.user.last_name
 
-                isDirector = ''
-                if(q.is_director_student):
-                    isDirector = 1
+                isDirector = 0
+                for q2 in queryDirectors:
+                    if(q.id == q2.professor.id):
+                        isDirector = 1
+                        break
+                        
                 ws.cell(row =defController, column=3).value = str(isDirector)
                 countHabDirigir += isDirector
 
@@ -295,19 +299,21 @@ class ReportTest(APIView):
 
             ws['J4']="Período: "+str(InitialPeriod)+" - "+str(FinalPeriod)
             varEstXTutor = 0
-            if(countHabDirigir > 0):
-                ws.cell(row=controller,column=3).alignment = Alignment(horizontal="center")
-                ws.cell(row=controller,column=3).border = Border(top=Side(border_style="thin"))
-                ws.cell(row =controller, column=3).font = Font(name='Arial',size=8, bold =True)
-                ws.cell(row =controller, column=3).value = str(countHabDirigir)
-            
-                ws.cell(row=controller,column=4).alignment = Alignment(horizontal="center")
-                ws.cell(row=controller,column=4).border = Border(top=Side(border_style="thin"))
-                ws.cell(row =controller, column=4).font = Font(name='Arial',size=8, bold =True)
-                ws.cell(row =controller, column=4).value = str(countTutorias)
 
+            ws.cell(row=controller,column=3).alignment = Alignment(horizontal="center")
+            ws.cell(row=controller,column=3).border = Border(top=Side(border_style="thin"))
+            ws.cell(row =controller, column=3).font = Font(name='Arial',size=8, bold =True)
+            ws.cell(row =controller, column=3).value = str(countHabDirigir)
+        
+            ws.cell(row=controller,column=4).alignment = Alignment(horizontal="center")
+            ws.cell(row=controller,column=4).border = Border(top=Side(border_style="thin"))
+            ws.cell(row =controller, column=4).font = Font(name='Arial',size=8, bold =True)
+            ws.cell(row =controller, column=4).value = str(countTutorias)
+
+            if(countHabDirigir > 0):
                 varEstXTutor = countTutorias/countHabDirigir
                 varEstXTutor = ("{:.2f}".format(varEstXTutor))
+                
             ws['K5']=str(varEstXTutor)
             ws['K6']=str(countPrincipales)
             ws['K7']=str(countAsesoresExternos)
@@ -324,6 +330,7 @@ class ReportTest(APIView):
             response["Content-Disposition"] = content
             wb.save(response)
         
+        # -------------------------------- PDF -----------------------------------------
 
         if(kwargs["type"]==2):#Format pdf request.data["tipo"]==2
             filename = "ReporteInformePorAño.pdf"
@@ -344,7 +351,6 @@ class ReportTest(APIView):
             c.rect(104, 547, 350, 15)
             c.rect(104, 532, 350, 15)
             c.rect(104, 517, 350, 15)
-
             
             c.setFont('Helvetica-Bold',8)
             c.drawString(30,550,'CARACTERÍSTICA')
@@ -357,7 +363,6 @@ class ReportTest(APIView):
 
             high = 475
             wind = 650
-
             
             c.rect(wind-3, high, 122, 15)
             c.rect(wind-3, high-15, 122, 15)
@@ -376,14 +381,6 @@ class ReportTest(APIView):
             c.drawString(wind,high-12,'Trabajos de Grado:')
             c.drawString(wind,high-26,'Con tutores/asesores externos:')
 
-            
-
-            
-
-
-
-            
-
             #Table header
             styles = getSampleStyleSheet()
             styleBH = styles ["Normal"]
@@ -392,7 +389,6 @@ class ReportTest(APIView):
             styleBH.Font='Helvetica-Bold'
             high = high - 15
             #						
-
 
             profesor = Paragraph('''Profesor''',styleBH)
             habDirigir = Paragraph('''Habilitado para dirigir''',styleBH)
@@ -409,7 +405,6 @@ class ReportTest(APIView):
             styleN.alignment = 1 #TA_CENTER is 1
             styleN.fontSize = 8
 
-
             countPrincipales = 0
             countAsesoresExternos = 0
             countHabDirigir = 0
@@ -419,11 +414,12 @@ class ReportTest(APIView):
                 countEstProf = 0
                 professorName = Paragraph(q.user.first_name +" "+ q.user.last_name, styleN)
                 
-                
                 isDirector = ''
-                if(q.is_director_student):
-                    isDirector = Paragraph(str(1), styleN)
-                    countHabDirigir += 1
+                for q2 in queryDirectors:
+                    if(q.id == q2.professor.id):
+                        isDirector = Paragraph(str(1), styleN)
+                        countHabDirigir += 1
+                        break
                 profActual = len(data)
                 for q2 in queryStudentsProfessor:
                     if (q.user.id == q2.professor.user.id ):
@@ -449,19 +445,18 @@ class ReportTest(APIView):
                         professorName = ""
                         isDirector = ""
                 
-                
                 if(countEstProf == 0):
                     data.append([professorName, isDirector,'0', '', '', '', ''])
                     high = high - 18
 
                 data[profActual][2] = Paragraph(str(countEstProf), styleN)
 
-
             varEstXTutor = 0
             porcentaje = 0
+
+            c.drawString(135, high-10,str(countHabDirigir))
+            c.drawString(190, high-10,str(countEst))
             if(countHabDirigir != 0):
-                c.drawString(135, high-10,str(countHabDirigir))
-                c.drawString(190, high-10,str(countEst))
                 varEstXTutor = countEst/countHabDirigir
                 varEstXTutor = ("{:.2f}".format(varEstXTutor))
                         
@@ -474,9 +469,6 @@ class ReportTest(APIView):
             c.setFillColorRGB(1,0,0)
             c.drawString(777, 466, str(countPrincipales))
             c.drawString(777, 450,str(countAsesoresExternos))
-
-               
-            
                 
             #Table zise
             width, height = landscape(A4)
