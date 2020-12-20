@@ -6,8 +6,7 @@ class Project(models.Model):
     
     provisional_title = models.CharField(max_length=256, blank=False, null=False)
     objetive_topic = models.CharField(max_length=256, blank=False, null=False)
-    
-    
+        
 
     investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True)
     student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=True)
@@ -15,7 +14,7 @@ class Project(models.Model):
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
-    #todos los campos relacionados con proyecto en un json y al final los campos general capturar el json de crear proyecto sacar el json ponerlo en el json de los objetivos genereal y luego especifico.
+    
     class Meta:
         verbose_name='Proyecto'
         verbose_name_plural='Proyectos'
@@ -43,7 +42,7 @@ class General(Objetive):
 
 class Specific(Objetive):
     objetive_specifico = models.CharField(max_length=500, blank=False, null=False)
-    #Revisar
+    
 
     class Meta:
         verbose_name='Objetivo especifico'

@@ -20,11 +20,10 @@ class LoginSerializer(serializers.Serializer):
         raise serializers.ValidationError("Credenciales incorrectas")
 
 class CreateUserSerializer(serializers.ModelSerializer):
-    is_coordinator = serializers.BooleanField(required=False)
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'username', 'password', 'email', 'type_id', 'personal_id', 
-                'personal_code', 'photo', 'telephone', 'address', 'is_coordinator']
+                'personal_code', 'photo', 'telephone', 'address']
 
     def create(self, validate_data):
         instance = User.objects.create(**validate_data)
@@ -36,7 +35,7 @@ class ConsultUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'username', 'email', 'type_id', 'personal_id', 
-                'personal_code', 'photo', 'telephone', 'address', 'is_student', 'is_proffessor', 'is_coordinator']
+                'personal_code', 'photo', 'telephone', 'address']
 
 class UpdateUserSerializer(serializers.ModelSerializer):
     
@@ -51,16 +50,12 @@ class UpdateUserSerializer(serializers.ModelSerializer):
     photo = serializers.FileField(required=False)
     telephone = serializers.CharField(required=False)
     address = serializers.CharField(required=False)
-    is_proffessor = serializers.BooleanField(required=False)
-    is_student = serializers.BooleanField(required=False)
     is_active = serializers.BooleanField(required=False)
-    is_coordinator = serializers.BooleanField(required=False)
 
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'username', 'password', 'email', 'type_id', 'personal_id', 
-                'personal_code', 'photo', 'telephone', 'address', 'is_proffessor', 'is_student', 'is_active', 
-                'is_coordinator']
+                'personal_code', 'photo', 'telephone', 'address', 'is_active']
     
     def update(self, instance, validate_data):
         for attr, value in validate_data.items(): 

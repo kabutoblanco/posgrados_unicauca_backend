@@ -1,44 +1,47 @@
 #Este va servir como un estilo de view.py, este es el enlace el cual recibe la peticion y
 #se comunica con el serializador
 
-from rest_framework import generics, permissions
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+import datetime
 
-from d_accounts_app.backends import IsProfessor, IsCoordinator
-from d_accounts_app.models import User
-from a_students_app.models import StudentGroupInvestigation
+from io import BytesIO
+from datetime import datetime
 
-from .serializers import (CountrySerializer, StateSerializer, CitySerializer, InstitutionSerializer, 
-                        ProfessorSerializer, FacultySerializer, DepartmentSerializer, InvestigationGroupSerializer,
-                        KnowledgeAreaSerializer, InvestigationLineSerializer, WorksInvestGroupSerializer, 
-                        ManageInvestLineSerializer, ManageInvestGroupSerializer, AcademicTrainingSerializer,
-                        IsMemberSerializer, WorksDepartmSerializer, CoordinatorProgramSerializer)
-
-from .models import (Country, State, City, Institution, Professor, Faculty, Department, AcademicTraining,
-                    InvestigationGroup, KnowledgeArea, InvestigationLine, WorksInvestGroup, ManageInvestGroup,
-                    ManageInvestLine, IsMember, WorksDepartm, CoordinatorProgram)
-
+from django.db.models.signals import post_save
 from django.http.response import HttpResponse
 from django.views.generic.base import TemplateView
+
+from rest_framework import generics, permissions, status, views, viewsets
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
-from io import BytesIO
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import cm
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus.paragraph import Paragraph
 from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import cm
+from reportlab.pdfgen import canvas
 from reportlab.platypus import Table, TableStyle
-from a_students_app.models import Student,Enrrollment
+from reportlab.platypus.paragraph import Paragraph
 
-import datetime
-from datetime import datetime
+from a_students_app.models import StudentGroupInvestigation, Student, Enrrollment
+from d_accounts_app.backends import IsProfessor, IsCoordinator
+from d_accounts_app.models import User
 
+from .models import *
+from .serializers import *
+from .signals import *
+
+post_save.connect(change_professor, sender=Professor)
+post_save.connect(change_country, sender=Country)
+post_save.connect(change_state, sender=State)
+post_save.connect(change_city, sender=City)
+post_save.connect(change_inv_group, sender=InvestigationGroup)
+post_save.connect(change_know_area, sender=KnowledgeArea)
+post_save.connect(change_inv_line, sender=InvestigationLine)
+post_save.connect(change_user, sender=User)
 
 # Create your api's here.
 # --------------------------------------------------Arias
@@ -230,7 +233,7 @@ class ReportTest(APIView):
 
         return response        
 
-class CreateCountryAPI(generics.GenericAPIView):
+class CountryAPI(viewsets.ModelViewSet):
     """
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     API que permite:
@@ -240,132 +243,80 @@ class CreateCountryAPI(generics.GenericAPIView):
     """
     #permission_classes = [IsAuthenticated, IsCoordinator]
     serializer_class = CountrySerializer
+    queryset = Country.objects.all()
 
-    def post(self, request):
-        serializer = self.get_serializer(data = request.data) 
-        if serializer.is_valid():#Valida que los tipos de datos sean correctos
-            test = Country.objects.filter(name=request.data["name"])
-            if not(test):
-                country = serializer.save()              
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
-class CreateStateAPI(generics.GenericAPIView):
+class StateAPI(viewsets.ModelViewSet):
     """
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒►Departamento en contexto de País
     API que permite:
     ☠ Crear un Departamento, esta función hace uso del metodo POST.
-    PATH: 'api/1.0/crear_departamento/'
+    PATH: '/api/state/'
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     """
     #permission_classes = [IsAuthenticated, IsCoordinator]
     serializer_class = StateSerializer
-    def post(self, request):
-        serializer = self.get_serializer(data = request.data)
-        if serializer.is_valid():
-            isElement = State.objects.filter(name=request.data['name'])
-            if not(isElement):
-                department = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    queryset = State.objects.all()
 
-class CreateCityAPI(generics.GenericAPIView):
+class CityAPI(viewsets.ModelViewSet):
     """
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     API que permite:
     ☠ Crear una Ciudad, esta función hace uso del metodo POST.
-    PATH: 'api/1.0/crear_ciudad/'
+    PATH: '/api/city/'
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     """
     #permission_classes = [IsAuthenticated, IsCoordinator]
     serializer_class = CitySerializer
+    queryset = City.objects.all()
 
-    def post(self, request):
-        serializer = self.get_serializer(data = request.data)
-        if serializer.is_valid():
-            isElement = City.objects.filter(name=request.data['name'])
-            if not(isElement):
-                city = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
-class CreateInstitutionAPI(generics.GenericAPIView):
+class InstitutionAPI(viewsets.ModelViewSet):
     """
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     API que permite:
     ☠ Crear una Institución, esta función hace uso del metodo POST.
-    PATH: 'api/1.0/crear_institucion/'
+    PATH: '/api/Institution/'
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     """
+    #permission_classes = [IsAuthenticated, IsCoordinator]
     serializer_class = InstitutionSerializer
+    queryset = Institution.objects.all()
 
-    def post(self, request):
-        serializer = self.get_serializer(data = request.data)
-        if serializer.is_valid():
-            isElement = Institution.objects.filter(name_inst=request.data['name_inst'])
-            if not(isElement):
-                institution = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
-class CreateProfessorAPI(generics.GenericAPIView):# toca modificarlo a los cambios nuevos
+class ProfessorAPI(viewsets.ModelViewSet):
     """
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     API que permite:
-    ☠ Crear un Profesor, esta función hace uso del metodo POST.
+    ☠ Crear un Profesor, esta api hace uso del metodo POST.
     PATH: 'api/1.0/crear_profesor/'
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     """
     #permission_classes = [IsAuthenticated, IsCoordinator]
     serializer_class = ProfessorSerializer
+    queryset = Professor.objects.all()
 
-    def post(self, request):
-        serializer = self.get_serializer(data = request.data) 
-        assignedUser = User.objects.get(id=request.data['user'])
-        assignedUser.is_proffessor = True
-        assignedUser.save()
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
-class CreateFacultyAPI(generics.GenericAPIView):
+class FacultyAPI(viewsets.ModelViewSet):
     """
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     API que permite:
     ☠ Crear una Facultad, esta función hace uso del metodo POST.
-    PATH: 'api/1.0/crear_facultad/'
+    PATH: '/api/faculty/'
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     """
+    #permission_classes = [IsAuthenticated, IsCoordinator]
     serializer_class = FacultySerializer
+    queryset = Faculty.objects.all()
 
-    def post(self, request):
-        serializer = self.get_serializer(data = request.data)
-        if serializer.is_valid():
-            isElement = Faculty.objects.filter(name=request.data['name'])
-            if not(isElement):
-                faculty = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
-class CreateDepartmentAPI(generics.GenericAPIView):
+class DepartmentAPI(viewsets.ModelViewSet):
     """
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒►Departamento en contexto de Facultad
     API que permite:
     ☠ Crear un Departamento, esta función hace uso del metodo POST.
-    PATH: 'api/1.0/crear_departamento_u/'
+    PATH: '/api/department_u/'
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     """
+    #permission_classes = [IsAuthenticated, IsCoordinator]
     serializer_class = DepartmentSerializer
-
-    def post(self, request):
-        serializer = self.get_serializer(data = request.data)
-        if serializer.is_valid():
-            isElement = Department.objects.filter(name=request.data['name'])
-            if not(isElement):
-                department = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    queryset = Department.objects.all()
 #endregion
 
 #region Consult
@@ -381,83 +332,7 @@ class ConsultCountryAPI(APIView):
     #permission_classes = [IsAuthenticated, IsCoordinator]
     def get(self, request, *args, **kwargs):
         queryset = Country.objects.filter(status=True)
-        return Response({"Countrys": CountrySerializer(queryset, many=True).data })
-
-class FullConsultCountryAPI(APIView):
-    """
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    API que permite:
-    ☠ Consultar Paises (sin filtrar por status), esta función hace uso del metodo GET. 
-    PATH: 'api/1.0/consultar_pais/'
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    """
-    #permission_classes = [IsAuthenticated, IsCoordinator]
-    def get(self, request, *args, **kwargs):
-        queryset = Country.objects.all()
-        return Response({"Countrys": CountrySerializer(queryset, many=True).data })
-
-class ConsultCountry_idAPI(APIView):
-    """
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    API que permite:
-    ☠ Consultar País enviando su id, esta función hace uso del metodo GET. 
-    ☠ Actualizar un País enviando un JSON, esta función hace uso del método PUT.
-    PATH: 'api/1.0/consultar_pais_id/<int:id_country>'
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    """
-    #permission_classes = [IsAuthenticated, IsCoordinator]
-    def get(self, request, *args, **kwargs):
-        queryset = Country.objects.filter(id=kwargs["id_country"], status=True)
-        returned = CountrySerializer(queryset, many=True).data
-        if returned:
-            return Response({"Country": returned}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(f"No existe el País en la base de datos", status=status.HTTP_404_NOT_FOUND)
-
-    def put(self, request, *args, **kwargs):
-        try:
-            model = Country.objects.get(id=request.data['id'])
-        except Country.DoesNotExist:
-            return Response(f"No existe el País en la base de datos", status=status.HTTP_404_NOT_FOUND)
-
-        serializer = CountrySerializer(model, data=request.data)
-        if serializer.is_valid():
-            if 'status' in request.data.keys():
-                if request.data['status'] == False:
-                    states = State.objects.filter(country=model) 
-                    for regS in states: 
-                        tmpState =  State.objects.get(id=regS.id)
-                        tmpState.status = False
-                        tmpState.save()
-                        cities = City.objects.filter(state = tmpState)
-                        for regC in cities:
-                            tmpCity = City.objects.get(id=regC.id)
-                            tmpCity.status = False
-                            tmpCity.save()
-                            institutions = Institution.objects.filter(city=tmpCity)
-                            for regI in institutions:
-                                tmpInstitution = Institution.objects.get(id=regI.id)
-                                tmpInstitution.status = False
-                                tmpInstitution.save()
-                if request.data['status'] == True:   
-                    states = State.objects.filter(country=model) 
-                    for regS in states: 
-                        tmpState =  State.objects.get(id=regS.id)
-                        tmpState.status = True
-                        tmpState.save()
-                        cities = City.objects.filter(state = tmpState)
-                        for regC in cities:
-                            tmpCity = City.objects.get(id=regC.id)
-                            tmpCity.status = True
-                            tmpCity.save()
-                            institutions = Institution.objects.filter(city=tmpCity)
-                            for regI in institutions:
-                                tmpInstitution = Institution.objects.get(id=regI.id)
-                                tmpInstitution.status = True
-                                tmpInstitution.save()       
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+        return Response({"Countrys": CountrySerializer(queryset, many=True).data })  
 
 class ConsultState_CountryAPI(APIView):
     """
@@ -476,42 +351,6 @@ class ConsultState_CountryAPI(APIView):
             return Response({"States": returned}, status=status.HTTP_202_ACCEPTED)
         else:
             return Response(f"No existen Departamentos con ese País en la base de datos", status=status.HTTP_404_NOT_FOUND)
-
-    def put(self, request, *args, **kwargs):
-        try:
-            model = State.objects.get(id=request.data['id'])
-        except State.DoesNotExist:
-            return Response(f"No existe ese Departamento en la base de datos", status=status.HTTP_404_NOT_FOUND)
-        
-        print(request.data)
-        serializer = StateSerializer(model, data=request.data)
-        if serializer.is_valid():
-            if 'status' in request.data.keys():
-                if request.data['status'] == False:
-                    cities = City.objects.filter(state = model)
-                    for regC in cities:
-                        tmpCity = City.objects.get(id=regC.id)
-                        tmpCity.status = False
-                        tmpCity.save()
-                        institutions = Institution.objects.filter(city=tmpCity)
-                        for regI in institutions:
-                            tmpInstitution = Institution.objects.get(id=regI.id)
-                            tmpInstitution.status = False
-                            tmpInstitution.save()
-                if request.data['status'] == True:
-                    cities = City.objects.filter(state = model)
-                    for regC in cities:
-                        tmpCity = City.objects.get(id=regC.id)
-                        tmpCity.status = True
-                        tmpCity.save()
-                        institutions = Institution.objects.filter(city=tmpCity)
-                        for regI in institutions:
-                            tmpInstitution = Institution.objects.get(id=regI.id)
-                            tmpInstitution.status = True
-                            tmpInstitution.save()
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
 class FullConsultState_CountryAPI(APIView):
     """
@@ -600,7 +439,6 @@ class FullConsultCity_StateAPI(APIView):
         else:
             return Response(f"No existen Ciudades con ese Departamento en la base de datos", status=status.HTTP_404_NOT_FOUND)
 
-
 class ConsultInstitutionAPI(APIView):
     """
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
@@ -610,49 +448,8 @@ class ConsultInstitutionAPI(APIView):
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
     """
     def get(self, request, *args, **kwargs):
-        queryset = Institution.objects.filter(status=True, city__state__country__status=True)
+        queryset = Institution.objects.filter(status=True)
         return Response({"Institutions": InstitutionSerializer(queryset, many=True).data })
-
-class FullConsultInstitutionAPI(APIView):
-    """
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    API que permite:
-    ☠ Consultar Instituciones (sin filtrar por status), esta función hace uso del metodo GET.
-    PATH: 'api/1.0/consultar_institucion/'
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    """
-    def get(self, request, *args, **kwargs):
-        queryset = Institution.objects.all()
-        return Response({"Institutions": InstitutionSerializer(queryset, many=True).data })
-
-class ConsultInstitution_idAPI(APIView):
-    """
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    API que permite:
-    ☠ Consultar un Instituto enviando su id, esta función hace uso del metodo GET.
-    ☠ Actualizar un Instituto enviando un JSON, esta función hace uso del método PUT.
-    PATH: 'api/1.0/consultar_institucion_id/<int:id>'
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    """
-    def get(self, request, *args, **kwargs):
-        queryset = Institution.objects.filter(id=kwargs["id"], status=True) 
-        returned = InstitutionSerializer(queryset, many=True).data
-        if returned:
-            return Response({"Institution": returned}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(f"No existe Instituto en la base de datos", status=status.HTTP_404_NOT_FOUND)
-
-    def put(self, request, *args, **kwargs):
-        try:
-            model = Institution.objects.get(id=request.data['id'])
-        except Institution.DoesNotExist:
-            return Response(f"No existe Instituto en la base de datos", status=status.HTTP_404_NOT_FOUND)
-
-        serializer = InstitutionSerializer(model, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
 class ConsultFacultyAPI(APIView):
     """
@@ -666,35 +463,6 @@ class ConsultFacultyAPI(APIView):
         queryset = Faculty.objects.filter(status=True)
         return Response({"Facultys": FacultySerializer(queryset, many=True).data })
 
-class ConsultFaculty_idAPI(APIView):
-    """
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    API que permite:
-    ☠ Consultar una Facultad enviando su id, esta función hace uso del metodo GET.
-    ☠ Actualizar una Facultad enviando un JSON, esta función hace uso del método PUT.
-    PATH: 'api/1.0/consultar_facultad_id/<int:id>'
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    """
-    def get(self, request, *args, **kwargs):
-        queryset = Faculty.objects.filter(id=kwargs["id"], status=True)  
-        returned = FacultySerializer(queryset, many=True).data
-        if returned:
-            return Response({"Faculty": returned}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(f"No existe Facultad en la base de datos", status=status.HTTP_404_NOT_FOUND)
-
-    def put(self, request, *args, **kwargs):
-        try:
-            model = Faculty.objects.get(id=request.data['id'], status=True)
-        except Faculty.DoesNotExist:
-            return Response(f"No existe Facultad en la base de datos", status=status.HTTP_404_NOT_FOUND)
-
-        serializer = FacultySerializer(model, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
-
 class ConsultDepartmentAPI(APIView):
     """
     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒►Departamento en contexto de Facultad
@@ -707,54 +475,6 @@ class ConsultDepartmentAPI(APIView):
         queryset = Department.objects.filter(status=True)
         return Response({"Departments": DepartmentSerializer(queryset, many=True).data })
 
-class ConsultDepartment_idAPI(APIView):
-    """
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒►Departamento en contexto de Facultad
-    API que permite:
-    ☠ Consultar un Departamento enviando su id, esta función hace uso del metodo GET.
-    ☠ Actualizar un Departamento enviando un JSON, esta función hace uso del método PUT.
-    PATH: 'api/1.0/consultar_departamentoU_id/<int:id>'
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    """
-    def get(self, request, *args, **kwargs):
-        queryset = Department.objects.filter(id=kwargs["id"], status=True)  
-        returned = DepartmentSerializer(queryset, many=True).data
-        if returned:
-            return Response({"Department": returned}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(f"No existe Departamento en la base de datos", status=status.HTTP_404_NOT_FOUND)
-
-    def put(self, request, *args, **kwargs):
-        try:
-            model = Department.objects.get(id=request.data['id'], status=True)
-        except Department.DoesNotExist:
-            return Response(f"No existe Departamento en la base de datos", status=status.HTTP_404_NOT_FOUND)
-
-        serializer = DepartmentSerializer(model, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
-
-class CreateAcademicTrainingAPI(generics.GenericAPIView):
-    """
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    API que permite:
-    ☠ Crear una Formación Academica, esta función hace uso del metodo POST.
-    PATH: 'api/1.0/crear_formacion_academica/'
-    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-    """
-    #permission_classes = [IsAuthenticated, IsProfessor]
-    serializer_class = AcademicTrainingSerializer
-
-    def post(self, request):
-        serializer = self.get_serializer(data = request.data)
-        if serializer.is_valid():
-            isElement = AcademicTraining.objects.filter(professor=request.data['professor'],degree=request.data['degree'])
-            if not(isElement):
-                academicTraining = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 #endregion
 
 # Create your api's here.
@@ -762,56 +482,47 @@ class CreateAcademicTrainingAPI(generics.GenericAPIView):
 
 #region Create
 # Grupo de investigacion
-class CreateInvestigationGroupAPI(generics.GenericAPIView):
+class InvestigationGroupAPI(viewsets.ModelViewSet):
     """
     Clase usada para la implementacion de la API para crear un 
     Grupo de Investigacion
     """
     #permission_classes = [IsAuthenticated, IsCoordinator]
     serializer_class = InvestigationGroupSerializer
-
-    def post(self, request):
-        serializer = self.get_serializer(data = request.data)
-        if serializer.is_valid():
-            isElement = InvestigationGroup.objects.filter(name=request.data['name'])
-            if not(isElement):
-                investigationGroup = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    queryset = InvestigationGroup.objects.all()
 
 # Area del conocimiento
-class CreateKnowledgeAreaAPI(APIView):
+class KnowledgeAreaAPI(viewsets.ModelViewSet):
     """
     Clase usada para la implementacion de la API para crear un 
     Area del Conocimiento
     """
     #permission_classes = [IsAuthenticated, IsCoordinator]
-    def post(self, request):
-        serializer = KnowledgeAreaSerializer(data = request.data)
-        if serializer.is_valid():
-            isElement = KnowledgeArea.objects.filter(name=request.data['name'])
-            if not(isElement):
-                knowledgeArea = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    serializer_class = KnowledgeAreaSerializer
+    queryset = KnowledgeArea.objects.all()
 
 # Linea de investigacion
-class CreateInvestigationLineAPI(generics.GenericAPIView):
+class InvestigationLineAPI(viewsets.ModelViewSet):
     """
     Clase usada para la implementacion de la API para crear una
     Linea de Investigacion
     """
     #permission_classes = [IsAuthenticated, IsCoordinator]
     serializer_class = InvestigationLineSerializer
+    queryset = InvestigationLine.objects.all()
 
-    def post(self, request):
-        serializer = self.get_serializer(data = request.data)
-        if serializer.is_valid():
-            isElement = InvestigationLine.objects.filter(name=request.data['name'])
-            if not(isElement):
-                investigationLine = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+# Formacion academica
+class AcademicTrainingAPI(viewsets.ModelViewSet):
+    """
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    API que permite:
+    ☠ Crear una Formación Academica, esta función hace uso del metodo POST.
+    PATH: '/api/academic_training/'
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    """
+    #permission_classes = [IsAuthenticated, IsCoordinator]
+    serializer_class = AcademicTrainingSerializer
+    queryset = AcademicTraining.objects.all()
 
 # Trabaja entre GI y AC
 class CreateWorksInvestGroupAPI(generics.GenericAPIView):
@@ -824,13 +535,8 @@ class CreateWorksInvestGroupAPI(generics.GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data = request.data)
         if serializer.is_valid():
-            isElement = WorksInvestGroup.objects.filter(
-                inv_group=request.data['inv_group'], know_area=request.data['know_area'],
-                inv_group__status=True, know_area__status=True
-            )
-            if not(isElement):
-                korksInvestGroup = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
+            korksInvestGroup = serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 # Dirige entre P y GI
@@ -844,16 +550,8 @@ class CreateManageInvestGroupAPI(generics.GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data = request.data)
         if serializer.is_valid():
-            isElement = ManageInvestGroup.objects.filter(
-                inv_group=request.data['inv_group'], professor=request.data['professor'], 
-                professor__status=True, inv_group__status=True, professor__is_director_gi=False
-            )
-            if not(isElement):
-                assignedProfessor = Professor.objects.get(id=request.data['professor'])
-                assignedProfessor.is_director_gi = True
-                assignedProfessor.save()
-                directs = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
+            directs = serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 # Es miembro entre P y GI
@@ -867,13 +565,8 @@ class CreateIsMemberAPI(generics.GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data = request.data)
         if serializer.is_valid():
-            isElement = IsMember.objects.filter(
-                inv_group=request.data['inv_group'], professor=request.data['professor'],
-                professor__status=True, inv_group__status=True
-            )
-            if not(isElement):
-                is_member = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
+            is_member = serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 # Maneja entre P y LI
@@ -887,13 +580,8 @@ class CreateManageInvestLineAPI(generics.GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data = request.data)
         if serializer.is_valid():
-            isElement = ManageInvestLine.objects.filter(
-                inv_line=request.data['inv_line'], professor=request.data['professor'],
-                professor__status=True, inv_line__status=True
-            )
-            if not(isElement):
-                drive = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
+            drive = serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 # Labora entre P y Departamento de la U
@@ -907,13 +595,8 @@ class CreateWorkDepartmentAPI(generics.GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data = request.data)
         if serializer.is_valid():
-            isElement = WorksDepartm.objects.filter(
-                department=request.data['department'], professor=request.data['professor'],
-                professor__status=True, department__status=True
-            )
-            if not(isElement):
-                work = serializer.save()
-                return Response(serializer.data, status = status.HTTP_201_CREATED)
+            work = serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 # Director entre profesor y programa
@@ -927,10 +610,6 @@ class CreateCoordinatorProgramAPI(generics.GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data = request.data)
         if serializer.is_valid():
-            newCoordinator = Professor.objects.get(id=request.data['professor'])
-            userCoordinator = User.objects.get(id=newCoordinator.user.pk)
-            userCoordinator.is_coordinator = True
-            userCoordinator.save()
             coordinator = serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
@@ -962,106 +641,15 @@ class ConsultInvestigationGroup_InstAPI(APIView):
     - - - - -
     Parameter
     - - - - -
-    dep : int
-        Referencia a un departamento
+    id : int
+        Referencia a una institucion
     """
     #permission_classes = [IsAuthenticated, IsCoordinator]
     def get(self, request, *args, **kwargs):
         queryset = InvestigationGroup.objects.filter(department__institution=kwargs['id'], status=True)
         return Response({"Groups": InvestigationGroupSerializer(queryset, many=True).data })
 
-class ConsultInvestigationGroup_idAPI(APIView):
-    """
-    Clase usada para la implementacion de la API para consultar y editar un Grupo de Investigacion
-    espesifico de la Universidad, esto se logra enviando el ID del Grupo de investigacion mediante 
-    el metodo GET y/o enviando la informacion que se va a editar del Grupo de Investigacion mediante
-    el metodo PUT
-    - - - - -
-    Parameters
-    - - - - -
-    id : int
-        Referencia a un grupo de investigacion
-    """
-    #permission_classes = [IsAuthenticated, IsCoordinator]
-    def get(self, request, *args, **kwargs):
-        queryset = InvestigationGroup.objects.filter(id=kwargs['id'], status=True)
-        
-        returned = InvestigationGroupSerializer(queryset, many=True).data
-        if returned:
-            return Response({"Group": returned}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(f"No existe el Grupo de investigacion en la base de datos", status=status.HTTP_404_NOT_FOUND)
-    
-    def put(self, request, *args, **kwargs):
-        try:
-            model = InvestigationGroup.objects.get(id=kwargs['id'], status=True)
-        except InvestigationGroup.DoesNotExist:
-            return Response(f"No existe el Grupo de investigacion en la base de datos", status=status.HTTP_404_NOT_FOUND)
-
-        serializer = InvestigationGroupSerializer(model, data=request.data)
-        if serializer.is_valid():
-            if 'status' in request.data.keys():
-                if request.data['status'] == False:
-                    worksInvGroups = WorksInvestGroup.objects.filter(inv_group=kwargs['id'])
-                    for ref in worksInvGroups:
-                        aux = WorksInvestGroup.objects.get(inv_group=ref.inv_group, know_area=ref.know_area)
-                        aux.study_status = False
-                        aux.save()
-                    try:
-                        manageInvLine = ManageInvestGroup.objects.get(inv_group=kwargs['id'], direction_state=True)
-                        manageInvLine.direction_state = False
-                        manageInvLine.save()
-                    except ManageInvestGroup.DoesNotExist:
-                        print("")
-                    oldProfessor = Professor.objects.get(id=manageInvLine.professor.pk, status=True)
-                    oldProfessor.is_director_gi = False
-                    oldProfessor.save()  
-                    isMember = IsMember.objects.filter(inv_group=kwargs['id']) 
-                    for reg in isMember: 
-                        aux =  IsMember.objects.get(professor = reg.professor, inv_group=reg.inv_group)
-                        aux.member_status = False
-                        aux.save()
-
-                    isMember = StudentGroupInvestigation.objects.filter(investigation_group=kwargs['id'])
-                    for reg in isMember: 
-                        aux =  StudentGroupInvestigation.objects.get(student = reg.student, investigation_group=reg.investigation_group)
-                        aux.is_active = False
-                        aux.save()
-                                         
-                    
-                if request.data['status'] == True:
-                    worksInvGroups = WorksInvestGroup.objects.filter(inv_group=kwargs['id'])
-                    for ref in worksInvGroups:
-                        refKnowArea = KnowledgeArea.objects.filter(id=ref.know_area, status=True)
-                        if refKnowArea:
-                            aux = WorksInvestGroup.objects.get(inv_group=ref.inv_group, know_area=ref.know_area)
-                            aux.study_status = True
-                            aux.save()
-                    try:
-                        manageInvLine = ManageInvestGroup.objects.get(inv_group=kwargs['id'])
-                        manageInvLine.direction_state = True
-                        manageInvLine.save()
-                    except ManageInvestGroup.DoesNotExist:
-                        print("")
-                    oldProfessor = Professor.objects.get(id=manageInvLine.professor.pk, status=True)
-                    oldProfessor.is_director_gi = True
-                    oldProfessor.save()  
-                    isMember = IsMember.objects.filter(inv_group=kwargs['id']) 
-                    for reg in isMember: 
-                        aux =  IsMember.objects.get(professor = reg.professor, inv_group=reg.inv_group)
-                        aux.member_status = True
-                        aux.save() 
-
-                    isMember = StudentGroupInvestigation.objects.filter(investigation_group=kwargs['id'])
-                    for reg in isMember: 
-                        aux =  StudentGroupInvestigation.objects.get(student = reg.student, investigation_group=reg.investigation_group)
-                        aux.is_active = True
-                        aux.save()
-
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+#profesores
 class ConsultProfessorAPI(APIView):
     """
     Clase usada para la implementacion de la API para consultar todos los Profesores
@@ -1071,74 +659,6 @@ class ConsultProfessorAPI(APIView):
     def get(self, request, *args, **kwargs):
         queryset = Professor.objects.filter(status=True)
         return Response({"Professors": ProfessorSerializer(queryset, many=True).data })
-
-class ConsultProfessor_idAPI(APIView):
-    """
-    Clase usada para la implementacion de la API para consultar y editar un Profesor espesifico
-    de la Universidad, esto se logra enviando el ID del Profesor mediante el metodo GET y/o enviando
-    la informacion que se va a editar del Profesor mediante el metodo PUT
-    - - - - -
-    Parameters
-    - - - - -
-    id : int
-        Referencia a un profesor
-    """
-    #permission_classes = [IsAuthenticated, IsCoordinator]
-    def get(self, request, *args, **kwargs):
-        queryset = Professor.objects.filter(id=kwargs['id'])
-
-        returned = ProfessorSerializer(queryset, many=True).data
-        if returned:
-            return Response({"Professor": returned}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(f"No existe el Profesor en la base de datos", status=status.HTTP_404_NOT_FOUND)
-
-    def put(self, request, *args, **kwargs):
-        try:
-            model = Professor.objects.get(id=kwargs['id'])
-        except Professor.DoesNotExist:
-            return Response(f"No existe el Profesor en la base de datos", status=status.HTTP_404_NOT_FOUND)
-
-        serializer = ProfessorSerializer(model, data=request.data)
-        if serializer.is_valid():
-            if 'status' in request.data.keys():
-                if request.data['status'] == False:
-                    isMemberProf = IsMember.objects.filter(professor=kwargs['id'])
-                    for ref in isMemberProf:
-                        aux = IsMember.objects.get(professor=ref.professor, inv_group=ref.inv_group)
-                        aux.member_status = False
-                        aux.save()
-                    manageIL = ManageInvestLine.objects.filter(professor=kwargs['id'])
-                    for ref in manageIL:
-                        aux = ManageInvestLine.objects.get(professor=ref.professor, inv_line=ref.inv_line)
-                        aux.analysis_state = False
-                        aux.save()
-                    manageIG = ManageInvestGroup.objects.filter(professor=kwargs['id'])
-                    for ref in manageIG:
-                        aux = ManageInvestGroup.objects.get(professor=ref.professor, inv_group=ref.inv_group)
-                        aux.direction_state = False
-                        aux.save()
-
-
-                if request.data['status'] == True:
-                    isMemberProf = IsMember.objects.filter(professor=kwargs['id'])
-                    for ref in isMemberProf:
-                        aux = IsMember.objects.get(professor=ref.professor, inv_group=ref.inv_group)
-                        aux.member_status = True
-                        aux.save()
-                    manageIL = ManageInvestLine.objects.filter(professor=kwargs['id'])
-                    for ref in manageIL:
-                        aux = ManageInvestLine.objects.get(professor=ref.professor, inv_line=ref.inv_line)
-                        aux.analysis_state = True
-                        aux.save()
-                    manageIG = ManageInvestGroup.objects.filter(professor=kwargs['id'])
-                    for ref in manageIG:
-                        aux = ManageInvestGroup.objects.get(professor=ref.professor, inv_group=ref.inv_group)
-                        aux.direction_state = True
-                        aux.save()
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ConsultProfessor_userAPI(APIView):
     """
@@ -1161,7 +681,17 @@ class ConsultProfessor_userAPI(APIView):
         else:
             return Response(f"No existe el Profesor en la base de datos", status=status.HTTP_404_NOT_FOUND)
 
+class ConsultProfessorDirectorGIAPI(APIView): #revisar
+    def get(self, request, *args, **kwargs):
+        filterProf = WorksDepartm.objects.filter(laboral_category="planta", professor__is_internal=True)
+        queryset = []
+        for ref in filterProf:
+            aux = Professor.objects.filter(id=ref.professor, status=True)
+            if aux:
+                queryset.extend(aux)
+        return Response({"Professors": ProfessorSerializer(queryset, many=True).data })
 
+# Area del conocimiento
 class ConsultKnowledgeAreaAPI(APIView):
     """
     Clase usada para la implementacion de la API para consultar todas las Areas del Conocimiento 
@@ -1172,76 +702,7 @@ class ConsultKnowledgeAreaAPI(APIView):
         queryset = KnowledgeArea.objects.filter(status=True)
         return Response({"Knowledges": KnowledgeAreaSerializer(queryset, many=True).data })
 
-class ConsultKnowledgeArea_idAPI(APIView):
-    """
-    Clase usada para la implementacion de la API para consultar y editar un Area del Conocimiento espesifica
-    de la Universidad, esto se logra enviando el ID del Area del Conocimiento mediante el metodo GET y/o enviando
-    la informacion que se va a editar del Area del Conocimiento mediante el metodo PUT
-    - - - - -
-    Parameters
-    - - - - -
-    id : int
-        Referencia a un Area del Conocimiento
-    """
-    #permission_classes = [IsAuthenticated, IsCoordinator]
-    def get(self, request, *args, **kwargs):
-        queryset = KnowledgeArea.objects.filter(id=kwargs['id'], status=True)
-        returned = KnowledgeAreaSerializer(queryset, many=True).data
-        if returned:
-            return Response({"Knowledge": KnowledgeAreaSerializer(queryset, many=True).data })
-        else:
-            return Response(f"No existe el Area de conocimiento en la base de datos...")
-
-    def put(self, request, *args, **kwargs):
-        try:
-            model = KnowledgeArea.objects.get(id=kwargs['id'], status=True)
-        except KnowledgeArea.DoesNotExist:
-            return Response(f"No existe el Area de conocimiento en la base de datos...")
-        
-        serializer = KnowledgeAreaSerializer(model, data=request.data)
-        if serializer.is_valid():
-            if "status" in request.data.keys():
-                if request.data["status"] == False:
-                    workInvGroups = WorksInvestGroup.objects.filter(know_area=kwargs['id'])
-                    for ref in workInvGroups:
-                        aux = WorksInvestGroup.objects.get(inv_group=ref.inv_group, know_area=ref.know_area)
-                        aux.study_status = False
-                        aux.save()
-                    invLines = InvestigationLine.objects.filter(know_area=kwargs['id'])
-                    for ref in invLines:
-                        aux = InvestigationLine.objects.get(id=ref.id)
-                        aux.status = False
-                        aux.save()
-                        manInvLines = ManageInvestLine.objects.filter(inv_line=ref.id)
-                        for refe in manInvLines:
-                            auxi = ManageInvestLine.objects.get(inv_line=refe.inv_line, professor=refe.professor)
-                            auxi.analysis_state = False
-                            auxi.save()
-
-                if request.data["status"] == True:
-                    workInvGroups = WorksInvestGroup.objects.filter(know_area=kwargs['id'])
-                    for ref in workInvGroups:
-                        refInvGroup = InvestigationGroup.objects.filter(id=ref.inv_group, status=True)
-                        if refInvGroup:
-                            aux = WorksInvestGroup.objects.get(inv_group=ref.inv_group, know_area=ref.know_area)
-                            aux.study_status = True
-                            aux.save()
-                    invLines = InvestigationLine.objects.filter(know_area=kwargs['id'])
-                    for ref in invLines:
-                        aux = InvestigationLine.objects.get(id=ref.id)
-                        aux.status = True
-                        aux.save()
-                        manInvLines = ManageInvestLine.objects.filter(inv_line=ref.id)
-                        for refe in manInvLines:
-                            prof = Professor.objects.get(id=refe.professor)
-                            if prof.status == True:
-                                auxi = ManageInvestLine.objects.get(inv_line=refe.inv_line, professor=refe.professor)
-                                auxi.analysis_state = True
-                                auxi.save()
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+# Lineas de investigacion
 class ConsultInvestigationLine_knowledgeAPI(APIView):
     """
     Clase usada para la implementacion de la API para consultar todas las Lineas de Investigacion que
@@ -1256,53 +717,7 @@ class ConsultInvestigationLine_knowledgeAPI(APIView):
         else:
             return Response(f"No existen Lineas de Investigacion asociadas a esa Area del conocimiento...")
 
-class ConsultInvestigationLine_idAPI(APIView):
-    """
-    Clase usada para la implementacion de la API para consultar una Linea de Investigacion espesifica 
-    de la Universidad, esto se logra enviando el ID de la Linea de Investigacion mediante el metodo GET 
-    y/o enviando la informacion que se va a editar de la Linea de Investigacion mediante el metodo PUT
-    - - - - -
-    Parameters
-    - - - - -
-    id : int
-        Referencia a una Linea de Investigacion
-    """
-    #permission_classes = [IsAuthenticated, IsCoordinator]
-    def get(self, request, *args, **kwargs):
-        queryset = InvestigationLine.objects.filter(id=kwargs['id'])
-        returned = InvestigationLineSerializer(queryset, many=True).data
-        if returned:
-            return Response({"Line": InvestigationLineSerializer(queryset, many=True).data })
-        else:
-            return Response(f"No existe la Linea de investigacion en la base de datos...")
-
-    def put(self, request, *args, **kwargs):
-        try:
-            model = InvestigationLine.objects.get(id=kwargs['id'])
-        except InvestigationLine.DoesNotExist:
-            return Response(f"No existe la Linea de investigacion en la base de datos...")
-
-        serializer = InvestigationLineSerializer(model, data=request.data)
-        if serializer.is_valid():
-            manInvLine = ManageInvestLine.objects.filter(inv_line=kwargs['id'])
-            if "analysis_state" in request.data.keys():
-                if request.data["analysis_state"] == False:
-                    for ref in manInvLine:
-                        aux = ManageInvestLine.objects.get(inv_line=ref.inv_line, professor=ref.professor)
-                        aux.analysis_state = False
-                        aux.save()
-                
-                if request.data["analysis_state"] == True:
-                    for ref in manInvLine:
-                        prof = Professor.objects.get(id=ref.professor)
-                        if prof.status == True:
-                            aux = ManageInvestLine.objects.get(inv_line=ref.inv_line, professor=ref.professor)
-                            aux.analysis_state = True
-                            aux.save()
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+# Es miembro
 class ConsultIsMemberAPI(APIView):
     """
     Clase usada para la implementacion de, la API para consultar si un profesor ES MIEMBRO o no de un 
@@ -1333,95 +748,6 @@ class ConsultIsMemberAPI(APIView):
 
         serializer = IsMemberSerializer(model, data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class ConsultWorksInvestGroupAPI(APIView):
-    """
-    Clase usada para la implementacion de, la API para consultar si un Grupo de Investigacion TRABAJA o no en un
-    Area del Conocimiento espesifica de la Universidad, esto se logra enviando el ID del Grupo de Investigacion y 
-    el ID del Area del Conocimiento (en ese orden) mediante el metodo GET y/o enviando la informacion 
-    que se va a editar del registro del modelo "Trabaja" mediante el metodo PUT
-    - - - - -
-    Parameters
-    - - - - -
-    id_gi : int
-        Referencia a un Grupo de Investigacion
-    id_ac : int
-        Referencia a un Area del Conocimiento
-    """
-    def get(self, request, *args, **kwargs):
-        queryset = WorksInvestGroup.objects.filter(inv_group=kwargs['id_gi'], know_area=kwargs['id_ac'], study_status=True)
-        returned = WorksInvestGroupSerializer(queryset, many=True).data
-        if returned:
-            return Response({"Work":returned}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
-    
-    def put(self, request, *args, **kwargs):
-        try:
-            model = WorksInvestGroup.objects.get(inv_group=kwargs['id_gi'], know_area=kwargs['id_ac'], study_status=True)
-        except IsMember.DoesNotExist:
-            return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
-
-        serializer = WorksInvestGroupSerializer(model, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class ConsultWorksInvestGroup_GIAPI(APIView):
-    def get(self, request, *args, **kwargs):
-        queryset = WorksInvestGroup.objects.filter(inv_group=kwargs['id'], study_status=True)
-        returned = WorksInvestGroupSerializer(queryset, many=True).data
-        if returned:
-            return Response({"Work":returned}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
-
-class ConsultManageInvestGroupAPI(APIView):
-    """
-    Clase usada para la implementacion de, la API para consultar si un Profesor DIRIGE o no un
-    Grupo de Investigacion espesifico de la Universidad, esto se logra enviando el ID del usuario del Profesor y 
-    el ID del Grupo de Investigacion (en ese orden) mediante el metodo GET y/o enviando la informacion 
-    que se va a editar del registro del modelo "Dirige" mediante el metodo PUT
-    - - - - -
-    Parameters
-    - - - - -
-    id_p : int
-        Referencia a un Profesor
-    id_gi : int
-        Referencia a un Grupo de Investigacion
-    """
-    def get(self, request, *args, **kwargs):
-        queryset = ManageInvestGroup.objects.filter(inv_group=kwargs['id_gi'], professor=kwargs['id_p'], direction_state=True)
-        returned = ManageInvestGroupSerializer(queryset, many=True).data
-        if returned:
-            return Response({"Manage":returned}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
-    
-    def put(self, request, *args, **kwargs):
-        try:
-            model = ManageInvestGroup.objects.get(inv_group=kwargs['id_gi'], professor=kwargs['id_p'], direction_state=True)
-        except IsMember.DoesNotExist:
-            return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
-
-        serializer = ManageInvestGroupSerializer(model, data=request.data)
-        if serializer.is_valid():
-            if 'professor' in request.data.keys():
-                oldProfessor = Professor.objects.get(id=kwargs['id_p'])
-                oldProfessor.is_director_gi = False
-                oldProfessor.save()
-                newProfessor = Professor.objects.get(id=request.data['professor'])
-                newProfessor.is_director_gi = True
-                newProfessor.save()
-            if 'status' in request.data.keys():
-                if request.data['status'] == False:
-                    oldProfessor = Professor.objects.get(id=kwargs['id_p'])
-                    oldProfessor.is_director_gi = False
-                    oldProfessor.save()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -1481,6 +807,97 @@ class ConsultMemberProfessorAPI(APIView):
                 return Response(f"El profesor no se encuentra activo", status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response(f"No existen registros en la base de datos para el ID ingresado", status=status.HTTP_404_NOT_FOUND)
+
+# Trabaja
+class ConsultWorksInvestGroupAPI(APIView):
+    """
+    Clase usada para la implementacion de, la API para consultar si un Grupo de Investigacion TRABAJA o no en un
+    Area del Conocimiento espesifica de la Universidad, esto se logra enviando el ID del Grupo de Investigacion y 
+    el ID del Area del Conocimiento (en ese orden) mediante el metodo GET y/o enviando la informacion 
+    que se va a editar del registro del modelo "Trabaja" mediante el metodo PUT
+    - - - - -
+    Parameters
+    - - - - -
+    id_gi : int
+        Referencia a un Grupo de Investigacion
+    id_ac : int
+        Referencia a un Area del Conocimiento
+    """
+    def get(self, request, *args, **kwargs):
+        queryset = WorksInvestGroup.objects.filter(inv_group=kwargs['id_gi'], know_area=kwargs['id_ac'], study_status=True)
+        returned = WorksInvestGroupSerializer(queryset, many=True).data
+        if returned:
+            return Response({"Work":returned}, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
+    
+    def put(self, request, *args, **kwargs):
+        try:
+            model = WorksInvestGroup.objects.get(inv_group=kwargs['id_gi'], know_area=kwargs['id_ac'], study_status=True)
+        except IsMember.DoesNotExist:
+            return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
+
+        serializer = WorksInvestGroupSerializer(model, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ConsultWorksInvestGroup_GIAPI(APIView):
+    def get(self, request, *args, **kwargs):
+        queryset = WorksInvestGroup.objects.filter(inv_group=kwargs['id'], study_status=True)
+        returned = WorksInvestGroupSerializer(queryset, many=True).data
+        if returned:
+            return Response({"Work":returned}, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
+
+# Dirige
+class ConsultManageInvestGroupAPI(APIView):
+    """
+    Clase usada para la implementacion de, la API para consultar si un Profesor DIRIGE o no un
+    Grupo de Investigacion espesifico de la Universidad, esto se logra enviando el ID del usuario del Profesor y 
+    el ID del Grupo de Investigacion (en ese orden) mediante el metodo GET y/o enviando la informacion 
+    que se va a editar del registro del modelo "Dirige" mediante el metodo PUT
+    - - - - -
+    Parameters
+    - - - - -
+    id_p : int
+        Referencia a un Profesor
+    id_gi : int
+        Referencia a un Grupo de Investigacion
+    """
+    def get(self, request, *args, **kwargs):
+        queryset = ManageInvestGroup.objects.filter(inv_group=kwargs['id_gi'], professor=kwargs['id_p'], direction_state=True)
+        returned = ManageInvestGroupSerializer(queryset, many=True).data
+        if returned:
+            return Response({"Manage":returned}, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
+    
+    def put(self, request, *args, **kwargs):
+        try:
+            model = ManageInvestGroup.objects.get(inv_group=kwargs['id_gi'], professor=kwargs['id_p'], direction_state=True)
+        except IsMember.DoesNotExist:
+            return Response(f"No existe un registro en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ManageInvestGroupSerializer(model, data=request.data)
+        if serializer.is_valid():
+            if 'professor' in request.data.keys():
+                oldProfessor = Professor.objects.get(id=kwargs['id_p'])
+                oldProfessor.is_director_gi = False
+                oldProfessor.save()
+                newProfessor = Professor.objects.get(id=request.data['professor'])
+                newProfessor.is_director_gi = True
+                newProfessor.save()
+            if 'status' in request.data.keys():
+                if request.data['status'] == False:
+                    oldProfessor = Professor.objects.get(id=kwargs['id_p'])
+                    oldProfessor.is_director_gi = False
+                    oldProfessor.save()
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ConsultManageInvestGroup_DirecAPI(APIView):
     """

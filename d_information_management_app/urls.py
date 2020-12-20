@@ -1,5 +1,7 @@
 #General
 from django.urls import path, include
+from rest_framework import routers
+from rest_framework.routers import DefaultRouter
 
 #Javier
 # from .views import consultarPais,crearDepartamento, crearCiudad, CrearPais
@@ -9,55 +11,50 @@ from django.urls import path, include
 #Jeison
 from .api import *
 
+router = DefaultRouter()
+
+router.register('country', CountryAPI) # Incluye crear, deditar y consultar todos los paises
+router.register('professor', ProfessorAPI) # Incluye crear, deditar y consultar todos los paises
+router.register('state', StateAPI)
+router.register('city', CityAPI)
+router.register('institution', InstitutionAPI)
+router.register('faculty', FacultyAPI)
+router.register('department_u', DepartmentAPI)
+router.register('academic_training', AcademicTrainingAPI)
+router.register('knowledge_area', KnowledgeAreaAPI)
+router.register('investigation_group', InvestigationGroupAPI)
+router.register('investigation_line', InvestigationLineAPI)
+
 urlpatterns = [
     #Javier
     #Crear
+    path('api/', include(router.urls)),
     path('api/1.0/report/<int:year>/<int:type>', ReportTest.as_view()),
-    path('api/1.0/crear_pais/', CreateCountryAPI.as_view()),
-    path('api/1.0/crear_departamento/', CreateStateAPI.as_view()),
-    path('api/1.0/crear_ciudad/', CreateCityAPI.as_view()),
-    path('api/1.0/crear_institucion/', CreateInstitutionAPI.as_view()),
-    path('api/1.0/crear_profesor/', CreateProfessorAPI.as_view()),
-    path('api/1.0/crear_facultad/', CreateFacultyAPI.as_view()),
-    path('api/1.0/crear_departamento_u/', CreateDepartmentAPI.as_view()),
-    path('api/1.0/crear_formacion_academica/', CreateAcademicTrainingAPI.as_view()),
     #Consultar
     path('api/1.0/consultar_pais/', ConsultCountryAPI.as_view()),
-    path('api/1.0/full_consultar_pais/', FullConsultCountryAPI.as_view()),
-    path('api/1.0/consultar_pais_id/<int:id_country>', ConsultCountry_idAPI.as_view()),
     path('api/1.0/consultar_departamento_pais/<int:id_country>', ConsultState_CountryAPI.as_view()),
     path('api/1.0/full_consultar_departamento_pais/<int:id_country>', FullConsultState_CountryAPI.as_view()),
     path('api/1.0/consultar_ciudad_departamento/<int:id_dep>', ConsultCity_StateAPI.as_view()),
     path('api/1.0/full_consultar_ciudad_departamento/<int:id_dep>', FullConsultCity_StateAPI.as_view()),
     path('api/1.0/consultar_institucion/', ConsultInstitutionAPI.as_view()),
-    path('api/1.0/full_consultar_institucion/', FullConsultInstitutionAPI.as_view()),
-    path('api/1.0/consultar_institucion_id/<int:id>', ConsultInstitution_idAPI.as_view()),
     path('api/1.0/consultar_facultad/', ConsultFacultyAPI.as_view()),
-    path('api/1.0/consultar_facultad_id/<int:id>', ConsultFaculty_idAPI.as_view()),
     path('api/1.0/consultar_departamentoU/', ConsultDepartmentAPI.as_view()),
-    path('api/1.0/consultar_departamentoU_id/<int:id>', ConsultDepartment_idAPI.as_view()),
     #Jeison
     #Crear
-    path('api/1.0/crear_grupo_investigacion/', CreateInvestigationGroupAPI.as_view()),
-    path('api/1.0/crear_area_conocimiento/', CreateKnowledgeAreaAPI.as_view()),
-    path('api/1.0/crear_linea_investigacion/', CreateInvestigationLineAPI.as_view()),
     path('api/1.0/crear_trabaja/', CreateWorksInvestGroupAPI.as_view()),
     path('api/1.0/crear_dirige/', CreateManageInvestGroupAPI.as_view()),
-    path('api/1.0/crear_maneja/', CreateManageInvestLineAPI.as_view()), # falta editar
+    path('api/1.0/crear_maneja/', CreateManageInvestLineAPI.as_view()),
     path('api/1.0/create_is_member/', CreateIsMemberAPI.as_view()),
     path('api/1.0/crear_labora/', CreateWorkDepartmentAPI.as_view()),
     path('api/1.0/crear_coordinador/', CreateCoordinatorProgramAPI.as_view()),
-    # falta todo lo relacionado con labora, desde crear hasta editar
     #Consultar
     path('api/1.0/consultar_gi_ins/<int:id>', ConsultInvestigationGroup_InstAPI.as_view()),
     path('api/1.0/consultar_gi_dep/<int:dep>', ConsultInvestigationGroup_DepartmentAPI.as_view()),
-    path('api/1.0/consultar_gi_id/<int:id>', ConsultInvestigationGroup_idAPI.as_view()),
     path('api/1.0/consultar_area_conocimiento/', ConsultKnowledgeAreaAPI.as_view()),
-    path('api/1.0/consultar_area_conocimiento/<int:id>', ConsultKnowledgeArea_idAPI.as_view()),
     path('api/1.0/consultar_li_area/<int:id_area>', ConsultInvestigationLine_knowledgeAPI.as_view()),
-    path('api/1.0/consultar_li_id/<int:id>', ConsultInvestigationLine_idAPI.as_view()),
+    # Profesor
+    path('api/1.0/profesor_director_gi/', ConsultProfessorDirectorGIAPI.as_view()),
     path('api/1.0/consultar_profesor/', ConsultProfessorAPI.as_view()),
-    path('api/1.0/consultar_profesor/<int:id>', ConsultProfessor_idAPI.as_view()),
     path('api/1.0/consultar_profesor_user/<int:id>', ConsultProfessor_userAPI.as_view()),
     # Es miembro
     path('api/1.0/consultar_es_miembro/<int:id_p>/<int:id_gi>', ConsultIsMemberAPI.as_view()), # ya esta editar es miembro (P-GI)
@@ -71,7 +68,7 @@ urlpatterns = [
     path('api/1.0/consultar_dirige_d/<int:id>', ConsultManageInvestGroup_DirecAPI.as_view()),
     path('api/1.0/consultar_dirige_gi/<int:id>', ConsultManageInvestGroup_GIAPI.as_view()),
     # Maneja entre Prf e IL
-    path('api/1.0/consultar_maneja/<int:id_p>/<int:id_i>', ConsultManageInvestLineAPI.as_view()), # ya esta editar labora (P-D)
+    path('api/1.0/consultar_maneja/<int:id_p>/<int:id_i>', ConsultManageInvestLineAPI.as_view()), # ya esta editar maneja (P-D)
     path('api/1.0/consultar_maneja_li/<int:id>', ConsultManageInvestLine_invLineAPI.as_view()),
     path('api/1.0/consultar_maneja_p/<int:id>', ConsultManageInvestLine_profAPI.as_view()),
     # Labora entre Prf y Dep

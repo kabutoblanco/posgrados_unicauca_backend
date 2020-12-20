@@ -43,8 +43,10 @@ class CreateUserAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
+            isElement = User.objects.filter(email=request.data['email'])
+            if not isElement:
+                user = serializer.save()
+                return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 class ConsultUserAPI(APIView):
@@ -85,21 +87,28 @@ class AuthUserAPI(APIView):
             if "Usuario sin rol" in typeList:
 	            typeList.remove("Usuario sin rol")
         except CoordinatorProgram.DoesNotExist:
-            print("No es coordinador")
+            pass
         try:
             ManageInvestGroup.objects.get(professor__user=kwargs['id'], professor__status=True)
             if "Usuario sin rol" in typeList:
 	            typeList.remove("Usuario sin rol")
-            typeList.append("director")
+            typeList.append("director_gi")
         except ManageInvestGroup.DoesNotExist:
-            print("No es director")
+            pass
+        
+        aux = StudentProfessor.objects.filter(professor__user=kwargs['id'], professor__status=True)
+        if aux:
+            if "Usuario sin rol" in typeList:
+                typeList.remove("Usuario sin rol")
+            typeList.append("director_s")
+        
         try:
             Professor.objects.get(user=kwargs['id'], status=True)
             if "Usuario sin rol" in typeList:
 	            typeList.remove("Usuario sin rol")
             typeList.append("profesor")
         except Professor.DoesNotExist:
-            print("No es profesor")
+            pass
         try:
             Student.objects.get(user=kwargs['id'], is_active=True)
             if "Usuario sin rol" in typeList:

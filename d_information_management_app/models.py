@@ -18,7 +18,7 @@ class Country(models.Model):
     status: Boolean
         Determina el estado del pais ([True]activo o [False]inactivo)
     """
-    name = models.CharField(max_length=30, blank=False, null=False)
+    name = models.CharField(max_length=30, blank=False, null=False, unique=True)
     status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Pais'
@@ -40,8 +40,8 @@ class State(models.Model):
     status: Boolean
         Determina el estado del departamento ([True]activo o [False]inactivo)
     """
-    name = models.CharField(max_length=30, blank=False, null=False)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=False, null=True)
+    name = models.CharField(max_length=30, blank=False, null=False, unique=True)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=False, null=True)
     status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Departamento'
@@ -63,8 +63,8 @@ class City(models.Model):
     status: Boolean
         Determina el estado de la ciudad ([True]activo o [False]inactivo)
     """
-    name = models.CharField(max_length=30, blank=False, null=False)
-    state = models.ForeignKey(State, on_delete=models.SET_NULL, blank=False, null=True)
+    name = models.CharField(max_length=30, blank=False, null=False, unique=True)
+    state = models.ForeignKey(State, on_delete=models.CASCADE, blank=False, null=True)
     status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Ciudad'
@@ -86,8 +86,8 @@ class Institution(models.Model):
     status: Boolean
         Determina el estado de la institucion ([True]activo o [False]inactivo)
     """
-    name_inst = models.CharField(max_length=30, blank=False, null=False)
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, blank=False, null=True)
+    name_inst = models.CharField(max_length=30, blank=False, null=False, unique=True)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, blank=False, null=True)
     status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Institucion'
@@ -109,8 +109,8 @@ class Faculty(models.Model):
     status: Boolean
         Determina el estado de la facultad ([True]activo o [False]inactivo)
     """
-    name = models.CharField(max_length=30, blank=False, null=False)
-    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
+    name = models.CharField(max_length=30, blank=False, null=False, unique=True)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, blank=False, null=True)
     status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Facultad'
@@ -132,8 +132,8 @@ class Department(models.Model):
     status: Boolean
         Determina el estado del departamento ([True]activo o [False]inactivo)
     """
-    name = models.CharField(max_length=30, blank=False, null=False)
-    faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, blank=False, null=True)
+    name = models.CharField(max_length=30, blank=False, null=False, unique=True)
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE, blank=False, null=True)
     status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
         verbose_name = 'Departamento de la universidad'
@@ -163,11 +163,10 @@ class Professor(models.Model):
     status: Boolean
         Determina el estado del profesor ([True]activo o [False]inactivo)
     """
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=False, null=True)
-    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=False, null=True)
-    is_director_student = models.BooleanField(default=False)
-    is_director_gi = models.BooleanField(default=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, null=True)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, blank=False, null=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, blank=False, null=True)
+    
     is_internal = models.BooleanField(default=False)
     status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
@@ -192,12 +191,13 @@ class AcademicTraining(models.Model):
     date : date
         Fecha en la cual obtuvo el titutlo
     """
-    professor =  models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
+    professor =  models.ForeignKey(Professor, on_delete=models.CASCADE, blank=False, null=True)
     degree = models.CharField(max_length=30, blank=False, null=False)
-    institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=False, null=True)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, blank=False, null=True)
     date = models.DateField()
 
     class Meta:
+        unique_together = ("professor", "degree")
         verbose_name = 'Formacion Academica'
         verbose_name_plural = 'Formaciones Academicas'
     
@@ -228,10 +228,10 @@ class InvestigationGroup(models.Model):
     status: Boolean
         Determina el estado del grupo de investigacion ([True]activo o [False]inactivo)
     """
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=False, null=True)
-    name = models.CharField(max_length=50)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, blank=False, null=True)
+    name = models.CharField(max_length=50, unique=True)
     category = models.CharField(max_length=50)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     foundation_date = models.DateField()
     status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
@@ -254,7 +254,7 @@ class KnowledgeArea(models.Model):
     status: Boolean
         Determina el estado del area de conocimiento ([True]activo o [False]inactivo)
     """
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=500)
     status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
@@ -279,8 +279,8 @@ class InvestigationLine(models.Model):
     status: Boolean
         Determina el estado de la linea de investigacion ([True]activo o [False]inactivo)
     """
-    know_area = models.ForeignKey(KnowledgeArea, on_delete=models.SET_NULL, blank=False, null=True)
-    name = models.CharField(max_length=50)
+    know_area = models.ForeignKey(KnowledgeArea, on_delete=models.CASCADE, blank=False, null=True)
+    name = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=500)
     status = models.BooleanField(default=True, blank=False, null=False)
     class Meta:
@@ -304,8 +304,8 @@ class WorksInvestGroup(models.Model):
     study_status : boolean
         Estado de la relacion en  la cual un grupo de investigacion trabaja o no en un area del conocimiento
     """
-    inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.SET_NULL, blank=False, null=True)
-    know_area = models.ForeignKey(KnowledgeArea, on_delete=models.SET_NULL, blank=False, null=True)
+    inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.CASCADE, blank=False, null=True)
+    know_area = models.ForeignKey(KnowledgeArea, on_delete=models.CASCADE, blank=False, null=True)
     study_status = models.BooleanField(default=True, blank=False, null=False)
 
     class Meta:
@@ -330,8 +330,8 @@ class ManageInvestLine(models.Model):
     analysis_state : boolean
         Estado de la relacionen en la cual el profesor maneja o no una linea de investigacion
     """
-    inv_line = models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True, default=1)
-    professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True, default=1)
+    inv_line = models.ForeignKey(InvestigationLine, on_delete=models.CASCADE, blank=False, null=True, default=1)
+    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, blank=False, null=True, default=1)
     analysis_state = models.BooleanField(default=True, blank=False, null=False)
 
     class Meta:
@@ -353,8 +353,8 @@ class ManageInvestGroup(models.Model):
     direction_state : boolean
         Estado de la relacion en la cual el profesor dirige o no un grupo de investigacion
     """
-    inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.SET_NULL, blank=False, null=True, default=1)
-    professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True, default=1)
+    inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.CASCADE, blank=False, null=True, default=1)
+    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, blank=False, null=True, default=1)
     direction_state = models.BooleanField(default=True, blank=False, null=False)
     
     class Meta:
@@ -376,8 +376,8 @@ class IsMember(models.Model):
     member_status : boolean
         Estado de la relacion en la cual el profesor es miembro o no de un grupo de investigacion
     """
-    professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
-    inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.SET_NULL, blank=False, null=True)
+    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, blank=False, null=True)
+    inv_group = models.ForeignKey(InvestigationGroup, on_delete=models.CASCADE, blank=False, null=True)
     member_status = models.BooleanField(default=True, blank=False, null=False)
 
     class Meta:
@@ -406,8 +406,8 @@ class WorksDepartm(models.Model):
     laboral_state : boolean
         Estado de la relacion en la cual el profesor es labora o no de un departamento de la universidad
     """
-    professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=False, null=True)
+    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, blank=False, null=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, blank=False, null=True)
     laboral_category = models.CharField(max_length=20, blank=False, null=False)
     time_category = models.CharField(max_length=20, blank=False, null=False)
     laboral_state = models.BooleanField(default=True, blank=False, null=False)
@@ -430,9 +430,11 @@ class CoordinatorProgram(models.Model):
         Referencia a un programa de la universidad
     academic_period : string[10]
         Periodo en el cual el profesor es coordinador del programa
+    is_active : boolean
+        Estado del coordinador ([True]Activo - [False]inactivo)
     """
-    professor = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
-    program = models.ForeignKey('a_students_app.Program', on_delete=models.SET_NULL, blank=False, null=True)
+    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, blank=False, null=True)
+    program = models.ForeignKey('a_students_app.Program', on_delete=models.CASCADE, blank=False, null=True)
     academic_period = models.CharField(max_length=10)
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
