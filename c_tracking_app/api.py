@@ -218,7 +218,7 @@ class CoordinatorActivitiesAPI(generics.RetrieveAPIView):
     """
 
     # permission_classes = (IsAuthenticated, IsCoordinador)
-    serializer_class = ActivityEnabledSerializer
+    serializer_class = ActivitySerializer
 
     def get(self, request, *args, **kwargs):
         queryset = ActivityProfessor.objects.filter(rol=3, is_active=True)
@@ -242,7 +242,7 @@ class CoordinatorActivitiesAPI(generics.RetrieveAPIView):
         #     else:            
         #         activity_serializer['is_enabled'] = False
         #     queryset_list.append(activity_serializer)
-        return Response({"activities": queryset_list})
+        return Response({"activities": self.get_serializer(queryset_list, many=True).data})
 # - - - - - SEGUNDO SPRINT - - - - -
 
 
