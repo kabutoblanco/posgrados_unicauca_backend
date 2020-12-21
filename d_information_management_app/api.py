@@ -475,6 +475,23 @@ class ConsultDepartmentAPI(APIView):
         queryset = Department.objects.filter(status=True)
         return Response({"Departments": DepartmentSerializer(queryset, many=True).data })
 
+class FullConsultInstitution_CityAPI(APIView):
+    """
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    API que permite:
+    ☠ Consultar Instituciones por ciudad, esta función hace uso del metodo GET.
+    PATH: 'api/1.0/full_consultar_institucion_ciudad/<int:id_city>'
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    """
+    def get(self, request, *args, **kwargs):
+        try:
+            City.objects.get(id=kwargs["id_city"])
+        except City.DoesNotExist:
+            return Response(f"No existe usa ciudad en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
+                    
+        queryset = Institution.objects.filter(city=kwargs["id_city"])
+        return Response({"Institutions": InstitutionSerializer(queryset, many=True).data }, status=status.HTTP_202_ACCEPTED)
+
 #endregion
 
 # Create your api's here.
