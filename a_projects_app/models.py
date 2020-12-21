@@ -8,8 +8,8 @@ class Project(models.Model):
     objetive_topic = models.CharField(max_length=256, blank=False, null=False)
         
 
-    investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.SET_NULL, blank=False, null=True)
-    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=False, null=True)
+    investigation_line =  models.ForeignKey(InvestigationLine, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -21,7 +21,7 @@ class Project(models.Model):
 
 class Objetive(models.Model):
 
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=False, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -52,8 +52,8 @@ class DirectorControl(models.Model):
 
     academic_period = models.CharField(max_length=20, blank=False, null=False)
 
-    director = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=False, null=True)
+    director = models.ForeignKey(Professor, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -67,8 +67,8 @@ class CoDirectorControl(models.Model):
 
     academic_period = models.CharField(max_length=20, blank=False, null=False)
 
-    codirector = models.ForeignKey(Professor, on_delete=models.SET_NULL, blank=False, null=True)
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=False, null=True)
+    codirector = models.ForeignKey(Professor, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
