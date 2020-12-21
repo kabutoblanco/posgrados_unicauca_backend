@@ -30,8 +30,8 @@ def send_email_to_coordinator(professor, student, test_director):
     }
 
     parameters_2 = {
-        'full_name': full_name,
-        'full_name_student': full_name_student,
+        'full_name': full_name_student,
+        'full_name_coordinator': full_name_director,
         'id': id,
         'title': title,
         'type': 'director'

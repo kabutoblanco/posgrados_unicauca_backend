@@ -1,16 +1,7 @@
 from .models import *
 from a_projects_app.models import Project
 def change_enrrollment (sender, instance, created, **kwargs):
-    if instance.state == 1:
-        students = Student.objects.filter(id=instance.student.id)
-        for student in students:
-            student.is_active=True
-            student.save()
-    else:
-        students = Student.objects.filter(id=instance.student.id)
-        for student in students:
-            student.is_active=False
-            student.save()
+    pass
 
 def change_student (sender, instance, created, **kwargs):
     if instance.is_active:
