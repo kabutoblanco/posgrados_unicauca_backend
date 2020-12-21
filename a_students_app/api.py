@@ -6,7 +6,9 @@ from .serializers import UpdateStudentSerializer,StudentSerializer,StudentProfes
 from .models import Student,StudentProfessor, Agreement, Grant, Enrrollment
 from d_information_management_app.models import Professor
 from d_accounts_app.models import User
+from .signals import *
 
+from django.db.models.signals import post_save
 from django.db.models import Avg, Sum, Count, Q
 from django.http.response import HttpResponse
 from django.views.generic.base import TemplateView
@@ -21,6 +23,9 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus.paragraph import Paragraph
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
+
+post_save.connect(change_enrrollment, sender=Enrrollment)
+post_save.connect(change_student, sender=Student)
 
 #MIRAR SI ES DE API QUUE DEBE heredar
 class ReporteEstudiantesExcel(TemplateView):
