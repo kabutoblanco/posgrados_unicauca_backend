@@ -39,6 +39,7 @@ urlpatterns = [
     path('api/1.0/consultar_institucion/', ConsultInstitutionAPI.as_view()),
     path('api/1.0/consultar_facultad/', ConsultFacultyAPI.as_view()),
     path('api/1.0/consultar_departamentoU/', ConsultDepartmentAPI.as_view()),
+    path('api/1.0/full_consultar_institucion_ciudad/<int:id_city>', FullConsultInstitution_CityAPI.as_view()),
     #Jeison
     #Crear
     path('api/1.0/crear_trabaja/', CreateWorksInvestGroupAPI.as_view()),

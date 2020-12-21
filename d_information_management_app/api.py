@@ -475,6 +475,23 @@ class ConsultDepartmentAPI(APIView):
         queryset = Department.objects.filter(status=True)
         return Response({"Departments": DepartmentSerializer(queryset, many=True).data })
 
+class FullConsultInstitution_CityAPI(APIView):
+    """
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    API que permite:
+    ☠ Consultar Instituciones por ciudad, esta función hace uso del metodo GET.
+    PATH: 'api/1.0/full_consultar_institucion_ciudad/<int:id_city>'
+    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+    """
+    def get(self, request, *args, **kwargs):
+        try:
+            City.objects.get(id=kwargs["id_city"])
+        except City.DoesNotExist:
+            return Response(f"No existe usa ciudad en la base de datos para los datos ingresados", status=status.HTTP_404_NOT_FOUND)
+                    
+        queryset = Institution.objects.filter(city=kwargs["id_city"])
+        return Response({"Institutions": InstitutionSerializer(queryset, many=True).data }, status=status.HTTP_202_ACCEPTED)
+
 #endregion
 
 # Create your api's here.
@@ -631,7 +648,7 @@ class ConsultInvestigationGroup_DepartmentAPI(APIView):
     #permission_classes = [IsAuthenticated, IsCoordinator]
     def get(self, request, *args, **kwargs):
         queryset = InvestigationGroup.objects.filter(department=kwargs['dep'], status=True)
-        return Response({"Groups": InvestigationGroupSerializer(queryset, many=True).data })
+        return Response({"Groups": InvestigationGroupSerializer(queryset, many=True).data }, status = status.HTTP_200_OK)
 
 class ConsultInvestigationGroup_InstAPI(APIView):
     """
@@ -647,7 +664,7 @@ class ConsultInvestigationGroup_InstAPI(APIView):
     #permission_classes = [IsAuthenticated, IsCoordinator]
     def get(self, request, *args, **kwargs):
         queryset = InvestigationGroup.objects.filter(department__faculty__institution=kwargs['id'], status=True)
-        return Response({"Groups": InvestigationGroupSerializer(queryset, many=True).data })
+        return Response({"Groups": InvestigationGroupSerializer(queryset, many=True).data }, status = status.HTTP_200_OK)
 
 #profesores
 class ConsultProfessorAPI(APIView):
@@ -658,7 +675,7 @@ class ConsultProfessorAPI(APIView):
     #permission_classes = [IsAuthenticated, IsCoordinator]
     def get(self, request, *args, **kwargs):
         queryset = Professor.objects.filter(status=True)
-        return Response({"Professors": ProfessorSerializer(queryset, many=True).data })
+        return Response({"Professors": ProfessorSerializer(queryset, many=True).data }, status = status.HTTP_200_OK)
 
 class ConsultProfessor_userAPI(APIView):
     """
@@ -689,7 +706,7 @@ class ConsultProfessorDirectorGIAPI(APIView):
             aux = Professor.objects.filter(id=ref.professor.id)
             if aux:
                 queryset.extend(aux)
-        return Response({"Professors": ProfessorSerializer(queryset, many=True).data })
+        return Response({"Professors": ProfessorSerializer(queryset, many=True).data }, status = status.HTTP_200_OK)
 
 class ConsultProfessorDirectorStudentAPI(APIView):
     def get(self, request, *args, **kwargs):
@@ -704,7 +721,7 @@ class ConsultProfessorDirectorStudentAPI(APIView):
             aux = Professor.objects.filter(id=ref.professor.id)
             if aux:
                 queryset.extend(aux)
-        return Response({"Professors": ProfessorSerializer(queryset, many=True).data })
+        return Response({"Professors": ProfessorSerializer(queryset, many=True).data }, status = status.HTTP_200_OK)
 
 class ConsultProfessorCoodirectorPlantaAPI(APIView):
     def get(self, request, *args, **kwargs):
@@ -714,7 +731,7 @@ class ConsultProfessorCoodirectorPlantaAPI(APIView):
             aux = Professor.objects.filter(id=ref.professor.id)
             if aux:
                 queryset.extend(aux)
-        return Response({"Professors": ProfessorSerializer(queryset, many=True).data })
+        return Response({"Professors": ProfessorSerializer(queryset, many=True).data }, status = status.HTTP_200_OK)
 
 # Area del conocimiento
 class ConsultKnowledgeAreaAPI(APIView):
@@ -725,7 +742,7 @@ class ConsultKnowledgeAreaAPI(APIView):
     #permission_classes = [IsAuthenticated, IsCoordinator]
     def get(self, request, *args, **kwargs):
         queryset = KnowledgeArea.objects.filter(status=True)
-        return Response({"Knowledges": KnowledgeAreaSerializer(queryset, many=True).data })
+        return Response({"Knowledges": KnowledgeAreaSerializer(queryset, many=True).data }, status = status.HTTP_200_OK)
 
 # Lineas de investigacion
 class ConsultInvestigationLine_knowledgeAPI(APIView):
@@ -738,9 +755,9 @@ class ConsultInvestigationLine_knowledgeAPI(APIView):
         queryset = InvestigationLine.objects.filter(know_area=kwargs['id_area'], status=True)
         returned = InvestigationLineSerializer(queryset, many=True).data
         if returned:
-            return Response({"Lines": InvestigationLineSerializer(queryset, many=True).data })
+            return Response({"Lines": InvestigationLineSerializer(queryset, many=True).data }, status = status.HTTP_200_OK)
         else:
-            return Response(f"No existen Lineas de Investigacion asociadas a esa Area del conocimiento...")
+            return Response(f"No existen Lineas de Investigacion asociadas a esa Area del conocimiento...", status = status.HTTP_400_BAD_REQUEST)
 
 class ConsultInvestigationLine_GIAPI(APIView):
     """
@@ -757,9 +774,9 @@ class ConsultInvestigationLine_GIAPI(APIView):
                 queryset.extend(aux)
         returned = InvestigationLineSerializer(queryset, many=True).data
         if returned:
-            return Response({"Lines": InvestigationLineSerializer(queryset, many=True).data })
+            return Response({"Lines": InvestigationLineSerializer(queryset, many=True).data }, status=status.HTTP_200_OK)
         else:
-            return Response(f"No existen Lineas de Investigacion asociadas a esa Area del conocimiento...")
+            return Response(f"No existen Lineas de Investigacion asociadas a ese grupo de investigacion...", status=status.HTTP_400_BAD_REQUEST)
 
 # Es miembro
 class ConsultIsMemberAPI(APIView):

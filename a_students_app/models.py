@@ -13,7 +13,7 @@ class GrantAgreement(models.Model):
     end_date = models.DateField(auto_now=False)
     
 
-    student = models.ForeignKey ('Student', on_delete=models.SET_NULL, blank=True, null=True)
+    student = models.ForeignKey ('Student', on_delete=models.CASCADE )
     voucher = models.FileField (verbose_name='Comprobante', upload_to="voucher/%Y/%m/%d")
 
     date_record = models.DateTimeField(auto_now=True)
@@ -68,7 +68,7 @@ class Agreement(GrantAgreement):
 
 class Program(models.Model):
     name = models.CharField(max_length=148)
-    deparment = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=True, null=True)
+    deparment = models.ForeignKey(Department, on_delete=models.CASCADE )
     class Meta:
         verbose_name = 'Programa'
         verbose_name_plural = 'Programas'
@@ -88,8 +88,8 @@ class Student(models.Model):
     departament_origin= models.CharField(max_length=256)
 
 
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
-    program = models.ForeignKey(Program, on_delete=models.SET_NULL, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE )
+    program = models.ForeignKey(Program, on_delete=models.CASCADE )
     
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
@@ -112,7 +112,7 @@ class Enrrollment(models.Model):
     state = models.IntegerField(choices=TYPE_CHOICES)
     period = models.CharField(max_length=24)
 
-    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE )
 
     date_record = models.DateTimeField(auto_now=True)
     date_update = models.DateTimeField(auto_now=True)
