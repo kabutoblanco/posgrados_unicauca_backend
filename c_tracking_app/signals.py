@@ -24,7 +24,7 @@ def save_or_send_testdirector(sender, instance, created, **kwargs):
             activity.state = 3
             activity.save()
             # send email to coordinator
-            send_email_to_coordinator(professor, instance)
+            send_email_to_coordinator(professor, instance.activity.student, instance)
         else:
             # change status activity
             activity = instance.activity
@@ -39,6 +39,8 @@ def save_or_send_testdirector(sender, instance, created, **kwargs):
 def save_or_send_testcoordinator(sender, instance, created, **kwargs):
     try:
         if not instance.is_save:
+            # get director
+            director = ActivityProfessor.objects.get(activity=instance.activity, rol=1).professor
             # change status activity
             activity = instance.activity
             activity.state = 4
@@ -46,7 +48,12 @@ def save_or_send_testcoordinator(sender, instance, created, **kwargs):
             # send email to student
             professor = instance.coordinator
             student = instance.activity.student
-            send_email_to_student(professor, student, instance)
+            send_email_to_student(professor, director, student, instance)
+        else:
+            # change status activity
+            activity = instance.activity
+            activity.state = 3
+            activity.save()
     except:
         raise CustomException('No se pudo notificar al estudiante', 'detail', status.HTTP_204_NO_CONTENT)
 
