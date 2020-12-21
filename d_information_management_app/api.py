@@ -757,9 +757,9 @@ class ConsultInvestigationLine_GIAPI(APIView):
                 queryset.extend(aux)
         returned = InvestigationLineSerializer(queryset, many=True).data
         if returned:
-            return Response({"Lines": InvestigationLineSerializer(queryset, many=True).data })
+            return Response({"Lines": InvestigationLineSerializer(queryset, many=True).data }, status=status.HTTP_200_OK)
         else:
-            return Response(f"No existen Lineas de Investigacion asociadas a esa Area del conocimiento...")
+            return Response(f"No existen Lineas de Investigacion asociadas a ese grupo de investigacion...", status=status.HTTP_400_BAD_REQUEST)
 
 # Es miembro
 class ConsultIsMemberAPI(APIView):
