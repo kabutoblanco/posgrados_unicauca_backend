@@ -483,8 +483,10 @@ class ReportAPI(TemplateView):
                     border_style="thin"), top=Side(border_style="thin"), bottom=Side(border_style="thin"))
                 ws.cell(row=count, column=5).font = Font(
                     name='Calibri', size=12)
+                div = int(q["graduate"]) + int(q["enrrollment"])
+                if div == 0: div = 1
                 ws.cell(row=count, column=5).value = str(
-                    (int(q["graduate"]) / (int(q["graduate"]) + int(q["enrrollment"]))) * 100) + "%"
+                    (int(q["graduate"]) / div * 100)) + "%"
 
                 count += 1
 
@@ -539,12 +541,14 @@ class ReportAPI(TemplateView):
             high = 650
             count = 1
             for q in cohorte_list:
+                div = int(q["graduate"]) + int(q["enrrollment"])
+                if div == 0: div = 1
                 data.append([count,
                              q["period"],
                              q["enrrollment"],
                              q["graduate"],
-                             str((
-                                 int(q["graduate"]) / (int(q["graduate"]) + int(q["enrrollment"]))) * 100) + "%"
+                             str(
+                                 int(q["graduate"]) / div * 100) + "%"
                              ])
                 high = high - 18
                 count += 1
